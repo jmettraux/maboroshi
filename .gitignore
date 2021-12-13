@@ -4,3 +4,6 @@
 .rspec.out
 .vimspec
 
+.vimrc
+.viminfo
+
