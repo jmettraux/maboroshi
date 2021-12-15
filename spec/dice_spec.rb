@@ -50,13 +50,21 @@ describe 'maboroshi Dice' do
         ).to be_between(3, 18)
     end
 
-    it 'rolls d2d3' do
+    {
 
-      outcomes = [ 11, 12, 13, 21, 22, 23 ]
+      '3d6' =>
+        3..18,
+      'd2d3' => [
+        11, 12, 13, 21, 22, 23 ],
 
-      1000.times do
-        expect(evaluate('return Dice.roll("d2d3");')
-          ).to be_included_in(outcomes)
+    }.each do |k, v|
+
+      it "rolls #{k}" do
+
+        1_000.times do
+          expect(evaluate("return Dice.roll(#{k.inspect});")
+            ).to be_included_in(v)
+        end
       end
     end
   end
