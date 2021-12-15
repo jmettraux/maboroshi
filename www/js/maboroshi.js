@@ -24,7 +24,7 @@ var Dice = (function() {
 
   var parseOperation = function(s) {
 
-    var m = s.match(/^\s*(\+)\s*(.*)$/);
+    var m = s.match(/^\s*([-+])\s*(.*)$/);
     if ( ! m) return null;
 
     return [ m[1], m[m.length - 1] ];
@@ -32,7 +32,7 @@ var Dice = (function() {
 
   var parseNumber = function(s) {
 
-    var m = s.match(/^\s*(\d+)\s*(.*)$/);
+    var m = s.match(/^\s*(-?\d+)\s*(.*)$/);
     if ( ! m) return null;
 
     return [ parseInt(m[1], 10), m[m.length - 1] ];
@@ -51,10 +51,18 @@ var Dice = (function() {
 
     while(s1.length > 0) {
 
-      var r = parseDice(s1) || parseOperation(s1) || parseNumber(s1);
+      var r =
+        parseDice(s1) || parseNumber(s1) || parseOperation(s1);
       if ( ! r) break;
 
-      a.push(r[0]);
+      var l = a.slice(-1)[0];
+
+      var r0 = r[0];
+      if (typeof r0 === 'number' && r0 < 0 && typeof l !== 'string') {
+        a.push('+');
+      }
+      a.push(r0);
+
       s1 = r[1];
     }
 
@@ -93,6 +101,16 @@ var Dice = (function() {
         }
         else if (op === '+') {
           r = (r || 0) + e;
+          op = 'cat';
+        }
+        else if (op === '-') {
+          r = (r || 0) - e;
+          op = 'cat';
+        }
+        else if (typeof op === 'string') {
+          r = r || 0;
+          if (op === '+') { r = r + e; }
+          else { r = r - e; }
           op = 'cat';
         }
       }
