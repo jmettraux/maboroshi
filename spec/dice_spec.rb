@@ -41,5 +41,24 @@ describe 'maboroshi Dice' do
       end
     end
   end
+
+  describe '.roll' do
+
+    it 'rolls' do
+
+      expect(evaluate('return Dice.roll("3d6");')
+        ).to be_between(3, 18)
+    end
+
+    it 'rolls d2d3' do
+
+      outcomes = [ 11, 12, 13, 21, 22, 23 ]
+
+      1000.times do
+        expect(evaluate('return Dice.roll("d2d3");')
+          ).to be_included_in(outcomes)
+      end
+    end
+  end
 end
 

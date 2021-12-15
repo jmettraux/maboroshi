@@ -38,6 +38,10 @@ var Dice = (function() {
     return [ parseInt(m[1], 10), m[m.length - 1] ];
   };
 
+  var random = function(max) {
+    return 1 + Math.floor(Math.random() * (max - 1));
+  };
+
   // public functions
 
   this.parse = function(s) {
@@ -58,6 +62,46 @@ var Dice = (function() {
   };
 
   this.roll = function(s) {
+
+    var ds = self.parse(s);
+
+    var a = []
+
+    ds.forEach(function(e) {
+
+      var r = e;
+
+      if (typeof e === 'number') {
+      }
+      else if (typeof e === 'string') {
+      }
+      else {
+        r = 0; for (var i = 0; i < e.c; i++) { r = r + random(e.d); }
+      }
+
+      a.push(r);
+    });
+
+    var r = null;
+    var op = 'cat';
+
+    a.forEach(function(e) {
+
+      if (typeof e === 'number') {
+        if (op === 'cat') {
+          r = parseInt('' + (r || '') + e, 10);
+        }
+        else if (op === '+') {
+          r = (r || 0) + e;
+          op = 'cat';
+        }
+      }
+      else if (typeof e === 'string') {
+        op = e;
+      }
+    });
+
+    return r;
   };
 
   // done.

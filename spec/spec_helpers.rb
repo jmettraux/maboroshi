@@ -88,6 +88,14 @@ class ::String
   #end
 end
 
+class ::Integer
+
+  def included_in?(a)
+
+    a.include?(self)
+  end
+end
+
 
 #RSpec::Matchers.define :eqh do |expected|
 #
