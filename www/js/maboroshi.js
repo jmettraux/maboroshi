@@ -8,8 +8,6 @@ var Dice = (function() {
 
   var self = this;
 
-  var elt = null;
-
   // protected functions
 
   var parseDice = function(s) {
@@ -127,4 +125,58 @@ var Dice = (function() {
   return this;
 
 }).apply({}); // end Dice
+
+
+var Table = (function() {
+
+  "use strict";
+
+  var self = this;
+
+  // protected functions
+
+  var tableFunctions = {
+
+    roll: function() {
+      clog(self);
+      return 'nada'; },
+  };
+
+  var addFunctions = function(table) {
+
+    return Object.assign(table, tableFunctions);
+  };
+
+  var parseMd = function(s) {
+
+    var a = [];
+
+    s
+      .split(/\r\n|\r|\n/)
+      .forEach(function(l) {
+        var l = l.trim(); if (l.length < 1) return;
+        var m = l.match(/^\d+\.\s+(.+)$/);
+        if (m) { a.push(m[1]); }
+        else { var la = a.slice(-1)[0]; if (la) a[a.length - 1] = la + ' ' + l; }
+      });
+
+    return { table: a };
+  };
+
+  // public functions
+
+  this.doMake = function(uri, s) {
+
+    return addFunctions(parseMd(s));
+  };
+
+  this.make = function(uri) {
+    // TODO
+  };
+
+  // done.
+
+  return this;
+
+}).apply({}); // end Table
 
