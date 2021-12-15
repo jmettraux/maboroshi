@@ -64,7 +64,7 @@ var Dice = (function() {
       s1 = r[1];
     }
 
-    return a;
+    return a.length < 1 ? null : a;
   };
 
   this.roll = function(s) {

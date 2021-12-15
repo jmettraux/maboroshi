@@ -44,6 +44,19 @@ describe 'maboroshi Dice' do
         expect(evaluate("return Dice.parse(#{k.inspect});")).to eq(v)
       end
     end
+
+    [
+
+      'nada',
+      'foo bar 1d6',
+
+    ].each do |k, v|
+
+      it "does not parse #{k}" do
+
+        expect(evaluate("return Dice.parse(#{k.inspect});")).to eq(nil)
+      end
+    end
   end
 
   describe '.roll' do
