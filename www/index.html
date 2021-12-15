@@ -34,7 +34,7 @@
     <script>
 
       var clog = console.log;
-      var cerr = console.err;
+      var cerr = console.error;
 
       H.onDocumentReady(function() {
 
@@ -51,10 +51,15 @@
 
           var u = decodeURIComponent(table.slice(6));
 
-          var t = MaboTable.make(u);
-          var r = t.roll();
-          H.setText('#result', r);
-          H.unhide('#result');
+          //var t = MaboTable.make(u);
+          MaboTable.make(u + 'xxx')
+            .then(function(t) {
+              clog('t', t); })
+              var r = t.roll();
+              H.setText('#result', r);
+              H.unhide('#result');
+            .catch(function(e) {
+              cerr(e); })
         }
       });
     </script>

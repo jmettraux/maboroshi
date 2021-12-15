@@ -168,14 +168,6 @@ var MaboTable = (function() {
     return { table: a };
   };
 
-  var doFetch = function(uri) {
-
-    var req = new XMLHttpRequest();
-    req.open('GET', uri, false); // asynchronous ? false
-    req.send(null);
-    return req.status === 200 ? req.responseText : null;
-  };
-
   // public functions
 
   this.doMake = function(uri, s) {
@@ -183,9 +175,17 @@ var MaboTable = (function() {
     return addFunctions(parseMd(s));
   };
 
-  this.make = function(uri) {
+  this.make = async function(uri) {
 
-    return self.doMake(uri, doFetch(uri));
+    var res = await fetch(uri);
+
+    if ( ! res.ok) {
+      throw new Error(`HTTP ${res.status} ${res.statusText} for ${uri}`);
+    }
+
+    var s = await res.text();
+
+    return self.doMake(uri, s);
   };
 
   // done.
