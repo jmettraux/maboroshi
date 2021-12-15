@@ -5,21 +5,17 @@
   <head>
 
     <meta charset="utf-8" />
+    <!--
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    -->
 
     <title>幻 maboroshi</title>
 
-    <!--
-    <link href="css/normalize-8.0.1.css" rel="stylesheet" type="text/css" />
-    <link href="css/fleuron.css" rel="stylesheet" type="text/css" />
-    <link href="css/fleuron-vanilla.css" rel="stylesheet" type="text/css" />
-    <link href="css/demo.css" rel="stylesheet" type="text/css" />
+    <link href="css/maboroshi.css" rel="stylesheet" type="text/css" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <script src="js/h-1.2.0-942b345.min.js"></script>
-    <script src="js/fleuron.js"></script>
-    <script src="js/demo.js"></script>
-    -->
+    <script src="js/h.min.js"></script>
+    <script src="js/maboroshi.js"></script>
+    <script src="js/qrcode-04f46c6.min.js"></script>
   </head>
 
   <body>
@@ -28,13 +24,11 @@
     </pre>
 
     <script>
-      //var clog = console.log;
-      //var cerr = console.err;
-      //H.onDocumentReady(function() {
-      //  //Demo.loadFlow('onboarding1.flo');
-      //  //Demo.loadFlow('switching0.flo');
-      //  Demo.loadFlow('travel.flo');
-      //});
+      var clog = console.log;
+      var cerr = console.err;
+      H.onDocumentReady(function() {
+        clog('ready');
+      });
     </script>
   </body>
 </html>
