@@ -54,14 +54,22 @@ describe 'maboroshi Dice' do
 
       '3d6' =>
         3..18,
+      '3d6+2' =>
+        5..20,
+      '3d6 + 2' =>
+        5..20,
       'd2d3' => [
         11, 12, 13, 21, 22, 23 ],
+      'd2d3 + 1' => [
+        12, 13, 14, 22, 23, 24 ],
+      '1d6 + 1d8' =>
+        2..14,
 
     }.each do |k, v|
 
       it "rolls #{k}" do
 
-        1_000.times do
+        250.times do
           expect(evaluate("return Dice.roll(#{k.inspect});")
             ).to be_included_in(v)
         end
