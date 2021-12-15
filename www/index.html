@@ -19,15 +19,43 @@
   </head>
 
   <body>
-    <pre>
-      NADA
+
+    <pre id="result">
     </pre>
 
+    <div id="directory">
+      <ul>
+        <li><a href="/?table=monster0.md">monster0.md</a></li>
+        <li><a href="/?table=monster1.md">monster1.md</a></li>
+          <!-- TODO add qrcodes -->
+      </ul>
+    </div>
+
     <script>
+
       var clog = console.log;
       var cerr = console.err;
+
       H.onDocumentReady(function() {
-        clog('ready');
+
+        H.hide('#result');
+
+        var ss = window.location.search
+          .split(/[?&]/)
+          .filter(function(e) { return e.length > 0; });
+        var table = ss.find(function(e) { return e.match(/^table=.+/); });
+
+        if (table) {
+
+          H.hide('#directory');
+
+          var u = decodeURIComponent(table.slice(6));
+
+          var t = MaboTable.make(u);
+          var r = t.roll();
+          H.setText('#result', r);
+          H.unhide('#result');
+        }
       });
     </script>
   </body>

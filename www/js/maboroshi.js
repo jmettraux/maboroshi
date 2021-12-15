@@ -2,7 +2,7 @@
 // maboroshi.js
 
 
-var Dice = (function() {
+var MaboDice = (function() {
 
   "use strict";
 
@@ -127,7 +127,7 @@ var Dice = (function() {
 }).apply({}); // end Dice
 
 
-var Table = (function() {
+var MaboTable = (function() {
 
   "use strict";
 
@@ -138,13 +138,16 @@ var Table = (function() {
   var tableFunctions = {
 
     roll: function() {
-      clog(self);
+      clog(this);
       return 'nada'; },
   };
 
   var addFunctions = function(table) {
 
-    return Object.assign(table, tableFunctions);
+    for (var k in tableFunctions) {
+      table[k] = tableFunctions[k].bind(table); }
+
+    return table;
   };
 
   var parseMd = function(s) {
@@ -156,11 +159,21 @@ var Table = (function() {
       .forEach(function(l) {
         var l = l.trim(); if (l.length < 1) return;
         var m = l.match(/^\d+\.\s+(.+)$/);
-        if (m) { a.push(m[1]); }
-        else { var la = a.slice(-1)[0]; if (la) a[a.length - 1] = la + ' ' + l; }
+        if (m) {
+          a.push(m[1]); }
+        else {
+          var la = a.slice(-1)[0]; if (la) a[a.length - 1] = la + ' ' + l; }
       });
 
     return { table: a };
+  };
+
+  var doFetch = function(uri) {
+
+    var req = new XMLHttpRequest();
+    req.open('GET', uri, false); // asynchronous ? false
+    req.send(null);
+    return req.status === 200 ? req.responseText : null;
   };
 
   // public functions
@@ -171,7 +184,8 @@ var Table = (function() {
   };
 
   this.make = function(uri) {
-    // TODO
+
+    return self.doMake(uri, doFetch(uri));
   };
 
   // done.

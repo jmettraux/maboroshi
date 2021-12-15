@@ -8,13 +8,13 @@
 require 'spec_helpers.rb'
 
 
-describe 'maboroshi Dice' do
+describe 'MaboDice' do
 
   describe '.parse' do
 
     it 'parses' do
 
-      expect(evaluate('return Dice.parse("3d6");')
+      expect(evaluate('return MaboDice.parse("3d6");')
         ).to eq([ { 'c' => 3, 'd' => 6 } ])
     end
 
@@ -41,7 +41,7 @@ describe 'maboroshi Dice' do
 
       it "parses #{k}" do
 
-        expect(evaluate("return Dice.parse(#{k.inspect});")).to eq(v)
+        expect(evaluate("return MaboDice.parse(#{k.inspect});")).to eq(v)
       end
     end
 
@@ -54,7 +54,7 @@ describe 'maboroshi Dice' do
 
       it "does not parse #{k}" do
 
-        expect(evaluate("return Dice.parse(#{k.inspect});")).to eq(nil)
+        expect(evaluate("return MaboDice.parse(#{k.inspect});")).to eq(nil)
       end
     end
   end
@@ -63,7 +63,7 @@ describe 'maboroshi Dice' do
 
     it 'rolls' do
 
-      expect(evaluate('return Dice.roll("3d6");')
+      expect(evaluate('return MaboDice.roll("3d6");')
         ).to be_between(3, 18)
     end
 
@@ -89,7 +89,7 @@ describe 'maboroshi Dice' do
       it "rolls #{k}" do
 
         250.times do
-          expect(evaluate("return Dice.roll(#{k.inspect});")
+          expect(evaluate("return MaboDice.roll(#{k.inspect});")
             ).to be_included_in(v)
         end
       end
