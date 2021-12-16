@@ -127,7 +127,7 @@ var MaboDice = (function() {
 }).apply({}); // end Dice
 
 
-var MaboTable = (function() {
+var MaboTableSet = (function() {
 
   "use strict";
 
@@ -152,20 +152,29 @@ var MaboTable = (function() {
 
   var parseMd = function(s) {
 
-    var a = [];
+    var n = null;
+    var ts = {};
+    var t = null;
 
     s
       .split(/\r\n|\r|\n/)
       .forEach(function(l) {
         var l = l.trim(); if (l.length < 1) return;
-        var m = l.match(/^\d+\.\s+(.+)$/);
+        var m = l.match(/^(#+)\s+(.+)$/);
         if (m) {
-          a.push(m[1]); }
+          if (m[1] === '#') n = m[2];
+          t = [];
+          ts[m[2]] = t;
+          return;
+        }
+        m = l.match(/^\d+\.\s+(.+)$/);
+        if (m) {
+          t.push(m[1]); }
         else {
-          var la = a.slice(-1)[0]; if (la) a[a.length - 1] = la + ' ' + l; }
+          var lt = t.slice(-1)[0]; if (lt) t[t.length - 1] = lt + ' ' + l; }
       });
 
-    return { table: a };
+    return { name: n, tables: ts };
   };
 
   // public functions
