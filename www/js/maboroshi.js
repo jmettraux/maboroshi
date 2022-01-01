@@ -139,35 +139,69 @@ var MaboTableSet = (function() {
   //  return 1 + Math.floor(Math.random() * (max - 1));
   //};
 
-  var interpret = function(s) {
+  var doEvalReference = function(set, s) {
+
+//clog('doEvalReference()', s);
+    var t = set.tables[s];
+//clog('doEvalReference()', 't', t);
+
+    if (t) return rollOnListTable(set, t);
+
+return "doEvalReference() FIXME";
+  };
+
+  var doEvalString = function(set, s) {
+
+//clog('doEvalString()', s);
+    if (s.slice(0, 1) === '@') return doEvalReference(set, s.slice(1).trim());
+
+    var d = MaboDice.parse(s);
+//clog('doEvalString()', 'd', d);
+    if (d) return '' + MaboDice.roll(s);
+  }
+
+  var evalString = function(set, s) {
+
+//clog('evalString()', s);
     var a = [];
-    return "xxx";
+    var s1 = s;
+
+    while (true) {
+      var m = s1.match(/^(\{[^}]+\})(.*)$/s) || s1.match(/^([^{]+)(.*)$/s);
+        // not the /s suffix to the regex!
+      if ( ! m) break;
+      a.push(m[1]); s1 = m[2];
+    }
+
+//clog('evalString()', 'a', a);
+    return a
+      .map(function(e) {
+        var m = e.match(/^\{\s*(.+)\s*\}$/);
+        return m ? doEvalString(set, m[1]) : e; })
+      .join('');
   };
 
-  var rollString = function(set, table) {
-clog('rollString()', set, table);
-return table.string;
+  var rollOnListTable = function(set, table) {
+
+    var i = Math.floor(Math.random() * table.entries.length);
+    return evalString(set, table.entries[i]);
   };
 
-  var rollList = function(set, table) {
-clog('rollList()', set, table);
-return 'fixme';
-  };
+  var tableSetFunctions = {
 
-  var tableFunctions = {
-
-    roll: function() {
+    roll: async function() {
       var t = this.tables[this.main];
       if ( ! t) return "didn't find table \"" + this.main + '"';
-      if (t.type === 'string') return rollString(this, t);
-      return rollList(this, t);
+//clog('roll()', t);
+      if (t.type === 'string') return evalString(this, t.string);
+      return rollOnListTable(this, t);
     }
   };
 
   var addFunctions = function(table) {
 
-    for (var k in tableFunctions) {
-      table[k] = tableFunctions[k].bind(table); }
+    for (var k in tableSetFunctions) {
+      table[k] = tableSetFunctions[k].bind(table); }
 
     return table;
   };
@@ -312,25 +346,4 @@ return 'fixme';
   return this;
 
 }).apply({}); // end MaboTableSet
-
-
-var Mabo = (function() {
-
-  "use strict";
-
-  var self = this;
-
-  // protected functions
-
-  // public functions
-
-  this.interpret = async function(s) {
-    return s;
-  };
-
-  // done.
-
-  return this;
-
-}).apply({}); // end Mabo
 
