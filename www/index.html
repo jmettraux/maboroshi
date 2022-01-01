@@ -36,15 +36,12 @@
       var clog = console.log;
       var cerr = console.error;
 
-      var roll = function(table) {
-
-        //clog('table', table);
-
-        var r = table.roll();
-
-        H.setText('#result', r);
-        H.unhide('#result');
-      };
+      //var roll = function(table) {
+      //  //clog('table', table);
+      //  var r = table.roll();
+      //  H.setText('#result', r);
+      //  H.unhide('#result');
+      //};
 
       H.onDocumentReady(function() {
 
@@ -61,8 +58,11 @@
 
           var u = decodeURIComponent(table.slice(6));
 
-          MaboTableSet.make(u)
-            .then(roll)
+          //MaboTableSet.make(u)
+          //  .then(roll)
+          //  .catch(function(e) { cerr(e); })
+          Mabo.interpret('{@ ' + u + '}')
+            .then(function(s) { H.setText('#result', s); H.unhide('#result'); })
             .catch(function(e) { cerr(e); })
         }
       });

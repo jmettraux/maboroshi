@@ -135,13 +135,33 @@ var MaboTableSet = (function() {
 
   // protected functions
 
+  //var random = function(max) {
+  //  return 1 + Math.floor(Math.random() * (max - 1));
+  //};
+
+  var interpret = function(s) {
+    var a = [];
+    return "xxx";
+  };
+
+  var rollString = function(set, table) {
+clog('rollString()', set, table);
+return table.string;
+  };
+
+  var rollList = function(set, table) {
+clog('rollList()', set, table);
+return 'fixme';
+  };
+
   var tableFunctions = {
 
     roll: function() {
-clog('roll()', this);
       var t = this.tables[this.main];
-clog('t', t);
-      return 'nada'; },
+      if ( ! t) return "didn't find table \"" + this.main + '"';
+      if (t.type === 'string') return rollString(this, t);
+      return rollList(this, t);
+    }
   };
 
   var addFunctions = function(table) {
@@ -291,5 +311,26 @@ clog('t', t);
 
   return this;
 
-}).apply({}); // end Table
+}).apply({}); // end MaboTableSet
+
+
+var Mabo = (function() {
+
+  "use strict";
+
+  var self = this;
+
+  // protected functions
+
+  // public functions
+
+  this.interpret = async function(s) {
+    return s;
+  };
+
+  // done.
+
+  return this;
+
+}).apply({}); // end Mabo
 
