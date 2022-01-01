@@ -61,7 +61,7 @@
 
           var u = decodeURIComponent(table.slice(6));
 
-          MaboTable.make(u)
+          MaboTableSet.make(u)
             .then(roll)
             .catch(function(e) { cerr(e); })
         }

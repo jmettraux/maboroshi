@@ -150,31 +150,108 @@ var MaboTableSet = (function() {
     return table;
   };
 
+  var parseMdSplit = function(s) {
+
+    var r = [];
+    var t = 'h1';
+    var n = null;
+    var a = [];
+    var m = null;
+
+    s.split(/\r\n|\r|\n/).forEach(function(l) {
+
+      if (l.trim().length < 1) return;
+
+      m = l.match(/^(#+)\s+(.+)$/);
+      if (m) {
+        if (n) { r.push({ name: n, type: t, lines: a }); n = null; a = []; }
+        t = m[1].length > 1 ? 'h2' : 'h1'; n = m[2];
+        return;
+      }
+
+      a.push(l);
+    });
+    r.push({ name: n, type: t, lines: a }); // over.
+
+    return r;
+  };
+
+  var parseMdExpandString = function(sct) {
+    return { type: 'string', string: sct.lines.join('\n') };
+  };
+
+  var parseMdExpandOl = function(sct) {
+    var m = null;
+    var i = -1;
+    var r = { name: sct.name, type: sct.type, l: 'ol', entries: [] };
+    sct.lines.forEach(function(l) {
+      m = l.match(/^\d+\.\s+(.+)$/);
+      if (m) { r.entries.push(m[1]); return; }
+      m = l.match(/^\s+(.+)$/);
+      i = r.entries.length - 1;
+      r.entries[i] = r.entries[i] + ' ' + m[1];
+    });
+    return r;
+  };
+
+  var parseMdExpandDl = function(sct) {
+    var r = { name: sct.name, type: sct.type, l: 'dl', entries: [] };
+    var m, c; var s = '';
+    sct.lines.forEach(function(l) {
+      m = l.match(/^(\d+)\s*-\s*(\d+)/);
+      if (m) {
+        if (c) {
+          s = s.trimStart();
+          for (var i = 0; i < c; i++) { r.entries.push(s); };
+          s = '';
+        }
+        var i = parseInt(m[1]); var j = parseInt(m[2]);
+        c = j - (i - 1);
+        return;
+      }
+      m = l.match(/^:\s+(.+)$/);
+      if (m) {
+        s = s + '\n' + m[1];
+        return;
+      }
+      m = l.match(/^([^:\s].*)$/);
+      if (m) {
+        if (c) {
+          s = s.trimStart();
+          for (var i = 0; i < c; i++) { r.entries.push(s); };
+          s = '';
+        }
+        c = 1;
+        return;
+      }
+      s = s + ' ' + l.trimStart();
+    });
+    s = s.trimStart(); for (var i = 0; i < c; i++) r.entries.push(s);
+    return r;
+  };
+
+  var isMdOl = function(l) {
+    return l.match(/^\d+\.\s+[^\s]/) || l.match(/^\s+[^\s]/);
+  };
+  var isMdDl = function(l) {
+    return l.match(/^[^\s]/) || l.match(/^:\s+[^\s]/) || l.match(/^\s+[^\s]+/);
+  };
+
+  var parseMdExpand = function(sct) {
+    if (sct.lines.every(isMdOl)) return parseMdExpandOl(sct);
+    if (sct.lines.every(isMdDl)) return parseMdExpandDl(sct);
+    return parseMdExpandString(sct);
+  };
+
   var parseMd = function(s) {
 
-    var n = null;
-    var ts = {};
-    var t = null;
+    var r = { main: null, tables: {} };
+    parseMdSplit(s).forEach(function(section) {
+      if (section.type === 'h1') r.main = section.name;
+      r.tables[section.name] = parseMdExpand(section);
+    });
 
-    s
-      .split(/\r\n|\r|\n/)
-      .forEach(function(l) {
-        var l = l.trim(); if (l.length < 1) return;
-        var m = l.match(/^(#+)\s+(.+)$/);
-        if (m) {
-          if (m[1] === '#') n = m[2];
-          t = [];
-          ts[m[2]] = t;
-          return;
-        }
-        m = l.match(/^\d+\.\s+(.+)$/);
-        if (m) {
-          t.push(m[1]); }
-        else {
-          var lt = t.slice(-1)[0]; if (lt) t[t.length - 1] = lt + ' ' + l; }
-      });
-
-    return { name: n, tables: ts };
+    return r;
   };
 
   // public functions
