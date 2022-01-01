@@ -138,7 +138,9 @@ var MaboTableSet = (function() {
   var tableFunctions = {
 
     roll: function() {
-      clog(this);
+clog('roll()', this);
+      var t = this.tables[this.main];
+clog('t', t);
       return 'nada'; },
   };
 
@@ -181,6 +183,11 @@ var MaboTableSet = (function() {
   };
 
   var parseMdExpandOl = function(sct) {
+
+    if ( ! sct.lines.every(function(l) {
+      return l.match(/^\d+\.\s+[^\s]/) || l.match(/^\s+[^\s]/); })
+    ) return null;
+
     var m = null;
     var i = -1;
     var r = { name: sct.name, type: sct.type, l: 'ol', entries: [] };
@@ -195,52 +202,58 @@ var MaboTableSet = (function() {
   };
 
   var parseMdExpandDl = function(sct) {
+
+    var rangeKey = function(l) {
+      var m = l.match(/^(\d+)\s*-\s*(\d+)/);
+      return m ? (parseInt(m[2], 10) - parseInt(m[1], 10) + 1) : false;
+    };
+    var stringKey = function(l) {
+      return l.match(/^[^:\s]/) ? 1 : false;
+    };
+    var colonValue = function(l) {
+      var m = l.match(/^:\s+([^\s].+)$/);
+      return m ? m[1] : false;
+    };
+    var spaceValue = function(l) {
+      var m = l.match(/^\s+([^\s].+)$/);
+      return m ? m[1] : false;
+    };
+
+    if ( ! sct.lines.find(colonValue)) return false;
+
     var r = { name: sct.name, type: sct.type, l: 'dl', entries: [] };
-    var m, c; var s = '';
-    sct.lines.forEach(function(l) {
-      m = l.match(/^(\d+)\s*-\s*(\d+)/);
-      if (m) {
-        if (c) {
-          s = s.trimStart();
-          for (var i = 0; i < c; i++) { r.entries.push(s); };
-          s = '';
-        }
-        var i = parseInt(m[1]); var j = parseInt(m[2]);
-        c = j - (i - 1);
-        return;
+
+    var l, k, v, c, s;
+
+    for (var i = 0, j = sct.lines.length; i < j; i++) {
+
+      l = sct.lines[i];
+
+      k = rangeKey(l) || stringKey(l);
+      if (k) {
+        if (c) for (var ii = 0; ii < c; ii++) r.entries.push(s);
+        c = k;
+        s = null;
+        continue;
       }
-      m = l.match(/^:\s+(.+)$/);
-      if (m) {
-        s = s + '\n' + m[1];
-        return;
-      }
-      m = l.match(/^([^:\s].*)$/);
-      if (m) {
-        if (c) {
-          s = s.trimStart();
-          for (var i = 0; i < c; i++) { r.entries.push(s); };
-          s = '';
-        }
-        c = 1;
-        return;
-      }
-      s = s + ' ' + l.trimStart();
-    });
-    s = s.trimStart(); for (var i = 0; i < c; i++) r.entries.push(s);
+
+      v = colonValue(l); if (v) { s = s ? s + '\n' + v : v; continue; }
+      v = spaceValue(l); if (v) { s = s ? s + ' ' + v : v; continue; }
+
+      return false; // not a <dl>
+    }
+
+    for (var ii = 0; ii < c; ii++) r.entries.push(s);
+
     return r;
   };
 
-  var isMdOl = function(l) {
-    return l.match(/^\d+\.\s+[^\s]/) || l.match(/^\s+[^\s]/);
-  };
-  var isMdDl = function(l) {
-    return l.match(/^[^\s]/) || l.match(/^:\s+[^\s]/) || l.match(/^\s+[^\s]+/);
-  };
-
   var parseMdExpand = function(sct) {
-    if (sct.lines.every(isMdOl)) return parseMdExpandOl(sct);
-    if (sct.lines.every(isMdDl)) return parseMdExpandDl(sct);
-    return parseMdExpandString(sct);
+
+    return(
+      parseMdExpandOl(sct) ||
+      parseMdExpandDl(sct) ||
+      parseMdExpandString(sct));
   };
 
   var parseMd = function(s) {
