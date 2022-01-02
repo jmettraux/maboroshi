@@ -1,12 +1,17 @@
 
 body {
   font-size: 12pt;
+  font-family: monospace;
 }
 
 .hidden { display: none; }
 
+pre {
+  white-space: pre-wrap;
+}
+
 #codes {
-  margin-top: 1rem;
+  margin-top: 2rem;
 }
 #codes > div {
   display: inline-block;
