@@ -15,7 +15,7 @@
 
     <script src="js/h.min.js"></script>
     <script src="js/maboroshi.js"></script>
-    <script src="js/qrcode-04f46c6.min.js"></script>
+    <script src="js/qrcode.min.js"></script>
   </head>
 
   <body>
@@ -31,6 +31,17 @@
       </ul>
     </div>
 
+    <div id="codes">
+      <div>
+        <div class="self"></div>
+        <div>self</div>
+      </div>
+      <div>
+        <div class="text"></div>
+        <div>text</div>
+      </div>
+    </div>
+
     <script>
 
       var clog = console.log;
@@ -40,8 +51,22 @@
 
         table.roll()
           .then(function(r) {
+
             H.setText('#result', r);
             H.unhide('#result');
+
+            //var qt = r
+            //  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            //  .slice(0, 4 * 1024);
+
+            new QRCode(
+              H.elt('#codes .text'),
+              { text: r,
+                width: 128,
+                height: 128,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H });
           });
       };
 
@@ -64,6 +89,15 @@
             .then(roll)
             .catch(function(e) { cerr(e); })
         }
+
+        new QRCode(
+          H.elt('#codes .self'),
+          { text: window.location.href,
+            width: 128,
+            height: 128,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H });
       });
     </script>
   </body>
