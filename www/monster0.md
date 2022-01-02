@@ -30,7 +30,7 @@ the dragon
 ## hard monsters
 
 1-2
-: {1d3} wyverns
+: {1d3+1d2} wyverns
 3-6
-: {1d6} wargs
+: {1d6+5} wargs
 
