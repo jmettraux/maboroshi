@@ -5,7 +5,8 @@
   <head>
 
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--meta name="viewport" content="width=device-width, initial-scale=1" /-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
     <title>幻 maboroshi</title>
 
@@ -45,10 +46,16 @@
       </div>
     </div>
 
+    <div id="flash" style="display: none;">flash</div>
+
+    <textarea id="clip"></textarea>
+
     <script>
 
       var clog = console.log;
       var cerr = console.error;
+
+      var qrwidth = 168;
 
       var roll = function(table) {
 
@@ -65,13 +72,15 @@
             new QRCode(
               H.elt('#codes .text .code'),
               { text: r,
-                width: 128,
-                height: 128,
+                width: qrwidth,
+                height: qrwidth,
                 colorDark: '#000000',
                 colorLight: '#ffffff',
                 correctLevel: QRCode.CorrectLevel.H });
 
-            H.elt('#codes .text img[src="images/copy.svg"]')._text = r;
+            var ve = H.elt('#codes .text img[src="images/copy.svg"]');
+            ve._text = r;
+            ve._what = 'text';
           });
       };
 
@@ -98,17 +107,26 @@
         new QRCode(
           H.elt('#codes .self .code'),
           { text: window.location.href,
-            width: 128,
-            height: 128,
+            width: qrwidth,
+            height: qrwidth,
             colorDark: '#000000',
             colorLight: '#ffffff',
             correctLevel: QRCode.CorrectLevel.H });
-        H.elt('#codes .self img[src="images/copy.svg"]')._text = window.location.href;
+
+        var ve = H.elt('#codes .self img[src="images/copy.svg"]');
+        ve._text = window.location.href;
+        ve._what = window.location.href;
 
         H.on('img[src="images/copy.svg"]', 'click', function(ev) {
-          clog(ev);
-          clog(ev.target);
-          clog(ev.target._text);
+          var ce = H.elt('#clip');
+          var fe = H.elt('#flash');
+          ce.value = ev.target._text;
+          ce.select();
+          document.execCommand('copy');
+          window.setTimeout(function() { ce.blur(); }, 100);
+          fe.textContent = "'" + ev.target._what + "' copied";
+          fe.style.display = 'block';
+          window.setTimeout(function() { fe.style.display = 'none'; }, 2100);
         });
       });
     </script>

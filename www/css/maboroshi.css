@@ -11,7 +11,7 @@ pre {
 }
 
 #codes {
-  margin-top: 2rem;
+  margin-top: 2.8rem;
 }
 #codes > div {
   display: inline-block;
@@ -22,9 +22,22 @@ pre {
 }
 
 img[src="images/copy.svg"] {
-  height: 14pt;
+  height: 16pt;
   position: absolute;
   right: 0;
   cursor: pointer;
+}
+
+#flash {
+  background-color: lightgreen;
+  border-radius: 15px;
+  margin-top: 2rem;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+#clip {
+  position: absolute;
+  top: -99rem;
 }
 
