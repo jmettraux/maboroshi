@@ -4,7 +4,7 @@
 
 ## libraries used
 
-* https://github.com/davidshimjs/qrcodejs
+* https://github.com/KeeeX/qrcodejs
 
 
 ## license
