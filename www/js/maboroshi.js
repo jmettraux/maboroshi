@@ -193,6 +193,7 @@ var MaboTableSet = (function() {
 
   var rollOnListTable = function(set, table) {
 
+clog('rollOnListTable()', table);
     var i = Math.floor(Math.random() * table.entries.length);
     return evalString(set, table.entries[i]);
   };
@@ -265,6 +266,31 @@ var MaboTableSet = (function() {
     return r;
   };
 
+  var parseMdExpandUl = function(sct) {
+
+clog('parseMdExpandUl()', sct);
+    var x = /^\*\s+(.+)$/;
+
+    if ( ! (sct.lines[0] || '').match(x)) return false;
+    if ( ! sct.lines.find(function(l) { return l.match(x); })) return false;
+
+    var r = { name: sct.name, type: sct.type, l: 'ul', entries: [] };
+    var m, s;
+
+    sct.lines.forEach(function(l) {
+      m = l.match(x);
+      if (m) {
+        r.entries.push(m[1]);
+      }
+      else {
+        var i = r.entries.length - 1;
+        r.entries[i] = r.entries[i] + '\n' + l.trimStart();
+      }
+    });
+
+    return r;
+  };
+
   var parseMdExpandDl = function(sct) {
 
     var rangeKey = function(l) {
@@ -316,6 +342,7 @@ var MaboTableSet = (function() {
 
     return(
       parseMdExpandOl(sct) ||
+      parseMdExpandUl(sct) ||
       parseMdExpandDl(sct) ||
       parseMdExpandString(sct));
   };
