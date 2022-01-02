@@ -139,28 +139,33 @@ var MaboTableSet = (function() {
   //  return 1 + Math.floor(Math.random() * (max - 1));
   //};
 
-  var doEvalReference = function(set, s) {
+  var doEvalReference = async function(set, s) {
 
-//clog('doEvalReference()', s);
+//clog('doEvalReference()', set, [ s ]);
     var t = set.tables[s];
-//clog('doEvalReference()', 't', t);
 
     if (t) return rollOnListTable(set, t);
 
-return "doEvalReference() FIXME";
+    if ( ! s.match(/\.md/)) throw 'unknown table "' + s + '"';
+
+    t = await MaboTableSet.make(s);
+
+    return t.roll();
   };
 
   var doEvalString = function(set, s) {
 
 //clog('doEvalString()', s);
-    if (s.slice(0, 1) === '@') return doEvalReference(set, s.slice(1).trim());
+    if (s.slice(0, 1) === '@') {
+      return doEvalReference(set, s.slice(1).trim());
+    }
 
     var d = MaboDice.parse(s);
 //clog('doEvalString()', 'd', d);
     if (d) return '' + MaboDice.roll(s);
   }
 
-  var evalString = function(set, s) {
+  var evalString = async function(set, s) {
 
 //clog('evalString()', s);
     var a = [];
@@ -173,12 +178,17 @@ return "doEvalReference() FIXME";
       a.push(m[1]); s1 = m[2];
     }
 
-//clog('evalString()', 'a', a);
-    return a
-      .map(function(e) {
-        var m = e.match(/^\{\s*(.+)\s*\}$/);
-        return m ? doEvalString(set, m[1]) : e; })
-      .join('');
+    var a1 = [];
+      //
+    for (var i = 0, l = a.length; i < l; i++) { // use a loop not a .map
+      var e = a[i];
+      var m = e.match(/^\{\s*(.+)\s*\}$/);
+      if ( ! m) { a1.push(e); continue; }
+      var e1 = await doEvalString(set, m[1]);
+      a1.push(e1);
+    }
+
+    return a1.join('');
   };
 
   var rollOnListTable = function(set, table) {
@@ -189,7 +199,7 @@ return "doEvalReference() FIXME";
 
   var tableSetFunctions = {
 
-    roll: async function() {
+    roll: function() {
       var t = this.tables[this.main];
       if ( ! t) return "didn't find table \"" + this.main + '"';
 //clog('roll()', t);

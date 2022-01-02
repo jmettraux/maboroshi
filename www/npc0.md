@@ -1,7 +1,7 @@
 
 # npc
 
-1. {#trait} {#race}
+{@trait} {@race}
 
 ## race
 

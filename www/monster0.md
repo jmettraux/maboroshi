@@ -13,8 +13,11 @@
 : {@ hard monsters}
   to catch
 
-x
+the dragon
 : 1 dragon
+
+1-10 some npc
+: {@ npc0.md}
 
 ## soft monsters
 
