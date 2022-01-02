@@ -29,13 +29,19 @@
     </div>
 
     <div id="codes">
-      <div>
-        <div class="self"></div>
-        <div>self</div>
+      <div class="self">
+        <div class="code"></div>
+        <div class="label">
+          self
+          <img src="images/copy.svg"></img>
+        </div>
       </div>
-      <div>
-        <div class="text"></div>
-        <div>text</div>
+      <div class="text">
+        <div class="code"></div>
+        <div class="label">
+          text
+          <img src="images/copy.svg"></img>
+        </div>
       </div>
     </div>
 
@@ -57,13 +63,15 @@
             //  .slice(0, 4 * 1024);
 
             new QRCode(
-              H.elt('#codes .text'),
+              H.elt('#codes .text .code'),
               { text: r,
                 width: 128,
                 height: 128,
                 colorDark: '#000000',
                 colorLight: '#ffffff',
                 correctLevel: QRCode.CorrectLevel.H });
+
+            H.elt('#codes .text img[src="images/copy.svg"]')._text = r;
           });
       };
 
@@ -88,13 +96,20 @@
         }
 
         new QRCode(
-          H.elt('#codes .self'),
+          H.elt('#codes .self .code'),
           { text: window.location.href,
             width: 128,
             height: 128,
             colorDark: '#000000',
             colorLight: '#ffffff',
             correctLevel: QRCode.CorrectLevel.H });
+        H.elt('#codes .self img[src="images/copy.svg"]')._text = window.location.href;
+
+        H.on('img[src="images/copy.svg"]', 'click', function(ev) {
+          clog(ev);
+          clog(ev.target);
+          clog(ev.target._text);
+        });
       });
     </script>
   </body>

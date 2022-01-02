@@ -16,4 +16,15 @@ pre {
 #codes > div {
   display: inline-block;
 }
+#codes .label {
+  margin-top: 0.5rem;
+  position: relative;
+}
+
+img[src="images/copy.svg"] {
+  height: 14pt;
+  position: absolute;
+  right: 0;
+  cursor: pointer;
+}
 
