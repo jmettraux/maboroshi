@@ -193,7 +193,7 @@ var MaboTableSet = (function() {
 
   var rollOnListTable = function(set, table) {
 
-clog('rollOnListTable()', table);
+//clog('rollOnListTable()', table);
     var i = Math.floor(Math.random() * table.entries.length);
     return evalString(set, table.entries[i]);
   };
@@ -227,8 +227,6 @@ clog('rollOnListTable()', table);
 
     s.split(/\r\n|\r|\n/).forEach(function(l) {
 
-      if (l.trim().length < 1) return;
-
       m = l.match(/^(#+)\s+(.+)$/);
       if (m) {
         if (n) { r.push({ name: n, type: t, lines: a }); n = null; a = []; }
@@ -244,19 +242,22 @@ clog('rollOnListTable()', table);
   };
 
   var parseMdExpandString = function(sct) {
+
     return { type: 'string', string: sct.lines.join('\n') };
   };
 
   var parseMdExpandOl = function(sct) {
 
-    if ( ! sct.lines.every(function(l) {
+    var ls = sct.lines.filter(function(l) { return l.trim().length > 0; });
+
+    if ( ! ls.every(function(l) {
       return l.match(/^\d+\.\s+[^\s]/) || l.match(/^\s+[^\s]/); })
     ) return null;
 
     var m = null;
     var i = -1;
     var r = { name: sct.name, type: sct.type, l: 'ol', entries: [] };
-    sct.lines.forEach(function(l) {
+    ls.forEach(function(l) {
       m = l.match(/^\d+\.\s+(.+)$/);
       if (m) { r.entries.push(m[1]); return; }
       m = l.match(/^\s+(.+)$/);
@@ -268,16 +269,17 @@ clog('rollOnListTable()', table);
 
   var parseMdExpandUl = function(sct) {
 
-clog('parseMdExpandUl()', sct);
+//clog('parseMdExpandUl()', sct);
     var x = /^\*\s+(.+)$/;
+    var ls = sct.lines.filter(function(l) { return l.trim().length > 0; });
 
-    if ( ! (sct.lines[0] || '').match(x)) return false;
-    if ( ! sct.lines.find(function(l) { return l.match(x); })) return false;
+    if ( ! (ls[0] || '').match(x)) return false;
+    if ( ! ls.find(function(l) { return l.match(x); })) return false;
 
     var r = { name: sct.name, type: sct.type, l: 'ul', entries: [] };
     var m, s;
 
-    sct.lines.forEach(function(l) {
+    ls.forEach(function(l) {
       m = l.match(x);
       if (m) {
         r.entries.push(m[1]);
