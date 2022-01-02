@@ -115,7 +115,7 @@
 
         var ve = H.elt('#codes .self img[src="images/copy.svg"]');
         ve._text = window.location.href;
-        ve._what = window.location.href;
+        ve._what = '"' + window.location.href + '"';
 
         H.on('img[src="images/copy.svg"]', 'click', function(ev) {
           var ce = H.elt('#clip');
@@ -124,7 +124,7 @@
           ce.select();
           document.execCommand('copy');
           window.setTimeout(function() { ce.blur(); }, 100);
-          fe.textContent = "'" + ev.target._what + "' copied";
+          fe.textContent = ev.target._what + " copied";
           fe.style.display = 'block';
           window.setTimeout(function() { fe.style.display = 'none'; }, 2100);
         });
