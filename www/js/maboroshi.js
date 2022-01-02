@@ -188,7 +188,7 @@ var MaboTableSet = (function() {
       a1.push(e1);
     }
 
-    return a1.join('');
+    return a1.join('').replaceAll(/\n\|\n/g, '\n\n');
   };
 
   var rollOnListTable = function(set, table) {
