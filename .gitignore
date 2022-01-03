@@ -7,3 +7,5 @@
 .vimrc
 .viminfo
 
+spec/.source.js
+

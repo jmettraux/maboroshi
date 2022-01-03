@@ -16,14 +16,14 @@ module Helpers
 
     $sources ||=
       begin
-        %w[ www/js/maboroshi.js ]
+        src = %w[ www/js/jaabro-1.4.0.com.js www/js/maboroshi.js ]
           .collect { |path| File.read(path) }
           .join(';')
+        File.open('spec/.source.js', 'w') { |f| f.write(src) }
+        src
       end
     $browser ||=
-      begin
-        Ferrum::Browser.new(js_errors: true)
-      end
+      Ferrum::Browser.new(js_errors: true)
 
     s1 = "JSON.stringify((function() { #{$sources}; #{s}; })())"
     j = begin

@@ -2,6 +2,10 @@
 // maboroshi.js
 
 
+//
+// MaboDice
+////////////////////////////////////////////////////////////////////////////////
+
 var MaboDice = (function() {
 
   "use strict";
@@ -126,6 +130,40 @@ var MaboDice = (function() {
 
 }).apply({}); // end Dice
 
+
+//
+// MaboStringParser
+////////////////////////////////////////////////////////////////////////////////
+
+var MaboStringParser = Jaabro.makeParser(function() {
+
+  //
+  // parse
+
+  function spiece(i) { return rex('spiece', i, /.+/); }
+
+  function string(i) { return seq('string', i, spiece, '*'); };
+  var root = string;
+
+  //
+  // rewrite
+
+  function rewrite_string(t) {
+
+    return t.subgather().map(rewrite);
+  }
+
+  function rewrite_spiece(t) {
+
+    return t.string();
+  }
+
+}); // end MaboStringParser
+
+
+//
+// MaboTableSet
+////////////////////////////////////////////////////////////////////////////////
 
 var MaboTableSet = (function() {
 
