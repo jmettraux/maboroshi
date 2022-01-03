@@ -15,7 +15,34 @@ describe 'MaboStringParser' do
     it 'parses' do
 
       t = evaluate("return MaboStringParser.parse('foo bar');")
-p t
+
+      expect(t).to be_a(Array)
+    end
+
+    {
+
+      "foo bar" => [
+        { 't' => 'sqs', 's' => 'foo bar' } ],
+
+      "a {@ status} goblin" => [
+        { 't' => 'sqs', 's' => 'a ' },
+        { 't' => 'cod', 'a' => [ { "s" => "@ status", "t" => "exp" } ] },
+        { 't' => 'sqs', 's' => ' goblin' } ],
+
+      "{@ status; 1d6} orc" => [
+        { "t" => "cod", "a" => [
+          { "s" => "@ status", "t" => "exp" },
+          { "s" => " 1d6", "t" => "exp" } ] },
+        { "s"=>" orc", "t"=>"sqs" } ],
+
+    }.each do |k, v|
+
+      it "parses #{k.inspect}" do
+
+        t = evaluate("return MaboStringParser.parse(#{k.inspect});")
+
+        expect(t).to eq(v)
+      end
     end
   end
 end

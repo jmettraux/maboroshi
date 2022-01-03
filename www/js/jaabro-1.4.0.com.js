@@ -301,8 +301,8 @@ var funs = fun.toString();
 .split(' ')
 .forEach(function(f) {
 funs = funs.replace(
-new RegExp(" +" + f + "\\(", 'g'),
-' Jaabro.' + f + '(');});
+new RegExp("return +" + f + "\\(", 'g'),
+'return Jaabro.' + f + '(');});
 funs =
 funs.slice(0, funs.lastIndexOf('}')) +
 'var rewrite_; rewrite_ = rewrite_ || ' + rw_ + ';' +
@@ -349,4 +349,4 @@ if (opts.prune !== false && t.result !== 1) return null;
 if (t.parter === 'all') t = t.children[0];
 if (opts.rewrite !== false) return this.rewrite(t);
 return t;};
-/* compacted from commit 8649c94 on Tue Apr 27 15:01:00 JST 2021 */
+/* compacted from commit d981b0d on Mon Jan  3 10:40:44 JST 2022 */

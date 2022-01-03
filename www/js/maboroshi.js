@@ -140,9 +140,18 @@ var MaboStringParser = Jaabro.makeParser(function() {
   //
   // parse
 
-  function spiece(i) { return rex('spiece', i, /.+/); }
+  function pbstart(i) { return str(null, i, '{'); }
+  function pbend(i) { return str(null, i, '}'); }
+  function semco(i) { return str(null, i, ';'); }
 
-  function string(i) { return seq('string', i, spiece, '*'); };
+  function exp(i) { return rex('exp', i, /[^;}]+/); }
+
+  function code(i) { return eseq('code', i, pbstart, exp, semco, pbend); }
+  function str(i) { return rex('str', i, /([^{]|\\{)+/); }
+
+  function code_or_str(i) { return alt(null, i, code, str); }
+
+  function string(i) { return seq('string', i, code_or_str, '*'); }
   var root = string;
 
   //
@@ -153,9 +162,19 @@ var MaboStringParser = Jaabro.makeParser(function() {
     return t.subgather().map(rewrite);
   }
 
-  function rewrite_spiece(t) {
+  function rewrite_str(t) {
 
-    return t.string();
+    return { t: 'sqs', s: t.string() };
+  };
+
+  function rewrite_code(t) {
+
+    return { t: 'cod', a: t.subgather().map(rewrite) };
+  };
+
+  function rewrite_exp(t) {
+
+    return { t: 'exp', s: t.string() };
   }
 
 }); // end MaboStringParser

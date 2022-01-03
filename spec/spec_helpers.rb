@@ -26,12 +26,14 @@ module Helpers
       Ferrum::Browser.new(js_errors: true)
 
     s1 = "JSON.stringify((function() { #{$sources}; #{s}; })())"
-    j = begin
-      $browser.evaluate(s1)
-    rescue Ferrum::DeadBrowserError
-      $browser = nil
-      return evaluate(s)
-    end
+
+    j =
+      begin
+        $browser.evaluate(s1)
+      rescue Ferrum::DeadBrowserError
+        $browser = nil
+        return evaluate(s)
+      end
 
     JSON.parse(j)
   end
