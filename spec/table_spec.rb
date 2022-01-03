@@ -26,11 +26,8 @@ describe 'MaboTableSet' do
       t = evaluate(
         "return MaboTableSet.doMake('monster0.md', #{@monster0j});")
 
-      expect(t['tables']['monster']).to eq([
-        '{1d6} goblins',
-        '{1d3} orcs with {1d2-1} shamans',
-        '{1d3} orcs with {1d2} warchief(s) and their moms',
-        '{1d2} ghosts' ])
+      expect(t['tables']['monsters']).to eq({
+        "type" => "string", "string" => "\n\n{@ some monsters}\n" })
     end
 
     it 'parses npc0' do
@@ -38,10 +35,13 @@ describe 'MaboTableSet' do
       t = evaluate(
         "return MaboTableSet.doMake('npc0.md', #{@npc0j});")
 
-      expect(t['tables']['npc']).to eq([
-        '{#trait} {#race}' ])
-      expect(t['tables']['race']).to eq([
-        'human', 'dwarf', 'elf', 'halflin' ])
+      expect(t['tables']['npc']).to eq({
+        "type"=>"string", "string" => "\n\n{@trait} {@race}\n" })
+      expect(t['tables']['race']).to eq({
+        "name" => "race",
+        "type" => "h2",
+        "l" => "ol",
+        "entries" => [ "human", "dwarf", "elf", "halflin" ] })
     end
   end
 end
