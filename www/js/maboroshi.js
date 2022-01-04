@@ -142,10 +142,11 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
   function pbstart(i) { return rex(null, i, /\{\s*/); }
   function pbend(i)   { return str(null, i, '}'); } // keep post space for sqs
-  function colon(i) { return str(null, i, ':'); }
-  function qmark(i) { return str(null, i, '?'); }
+  function colon(i) { return rex(null, i, /\s*:\s*/); }
+  function qmark(i) { return rex(null, i, /\s*\?\s*/); }
   function semco(i) { return rex(null, i, /;\s*/); }
   function atsig(i) { return rex(null, i, /@\s*/); }
+  function equal(i) { return rex(null, i, /\s*=\s*/); }
 
   function parstart(i) { return rex(null, i, /\(\s*/); }
   function parend(i)   { return rex(null, i, /\)\s*/); }
@@ -168,9 +169,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
     return alt(null, i,
       par, dice, vname, table, sqstring, dqstring, num, boo, nil); }
 
-  function equal(i) { return rex('equ', i, /=/); }
-
-  function vname(i) { return rex('vname', i, /[a-zA-Z][a-zA-Z0-9_]+/); }
+  function vname(i) { return rex('vname', i, /[a-zA-Z][a-zA-Z0-9_]*/); }
 
   function semod(i) { return rex('sop', i, /%/); }
   function seprd(i) { return rex('sop', i, /[\*\/]/); }
@@ -207,24 +206,46 @@ var MaboStringParser = Jaabro.makeParser(function() {
   //
   // rewrite
 
-  function _rewrite_s(t) { return { t: t.name, s: t.string() }; }
+  function _rewrite_void(t) {};
 
-  function rewrite_string(t) {
+  function _rewrite_s(t) {
+    return { t: t.name, s: t.string() }; }
+  function _rewrite_sub(t) {
     return t.subgather().map(rewrite); }
+  function _rewrite_nsub(t) {
+    return { t: t.name, a: t.subgather().map(rewrite) }; }
+
+  var rewrite_string = _rewrite_sub;
 
   function rewrite_exps(t) {
     return { t: 'exps', a: t.subgather().map(rewrite) }; }
 
   function rewrite_exp(t) {
+
     var a = t.subgather().map(rewrite);
+
+    //var ass = t.lookup('heass'); if (ass) {
+    //  return { t: 'ass', v: ass.lookup('vname').string(), a: a.slice(1) }; }
+
+    //var ter = t.lookup('heter'); if (ter) {
+    //  var aa = [ -1 ];
+    //  return { t: 'ter', a: aa }; }
+
     if (a.length === 1) return a[0];
     return { t: 'exp', a: a }; }
+
+  var rewrite_heass = _rewrite_nsub;
+  var rewrite_heter = _rewrite_nsub;
 
   function rewrite_table(t) {
     return { t: 'table', s: t.lookup('vname').string() }; }
 
+  function rewrite_num(t) {
+    return { t: 'num', n: parseInt(t.string(), 10) }; }
+
   var rewrite_sqs = _rewrite_s;
   var rewrite_dice = _rewrite_s;
+  var rewrite_vname = _rewrite_s;
 }); // end MaboStringParser
 
 
