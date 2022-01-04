@@ -189,7 +189,7 @@ var MaboTableSet = (function() {
 
   var evalNode = function(set, n) {
 
-clog('evalNode()', n);
+//clog('evalNode()', n);
     var ev = evals[n.t];
     if ( ! ev) throw "evals." + n.t + " not implemented.";
     return ev(set, n);
@@ -305,7 +305,8 @@ clog('evalNode()', n);
       }
       else {
         var i = r.entries.length - 1;
-        r.entries[i] = r.entries[i] + '\n' + l.trimStart();
+        var v = l.trimStart(); v = v === '|' ? '' : v;
+        r.entries[i] = r.entries[i] + '\n' + v;
       }
     });
 

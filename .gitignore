@@ -5,6 +5,7 @@
 .vimspec
 
 .vim*
+.todo.md
 
 spec/.source.js
 
