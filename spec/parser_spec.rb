@@ -25,26 +25,27 @@ describe 'MaboStringParser' do
         { 't' => 'sqs', 's' => 'foo bar' } ],
 
       "a {@ status} goblin" => [
-        { 't' => 'sqs', 's' => 'a ' },
-        { 't' => 'cod', 'a' => [ { "s" => "@ status", "t" => "exp" } ] },
-        { 't' => 'sqs', 's' => ' goblin' } ],
+        {"t"=>"sqs", "s"=>"a "},
+        {"t"=>"exps", "a"=>[{"t"=>"table", "s"=>"status"}]},
+        {"t"=>"sqs", "s"=>" goblin"}],
 
       "{@ status; 1d6} orc" => [
-        { "t" => "cod", "a" => [
-          { "s" => "@ status", "t" => "exp" },
-          { "s" => " 1d6", "t" => "exp" } ] },
-        { "s"=>" orc", "t"=>"sqs" } ],
-
-      "{@ name}" => [
-        ],
+       {"t"=>"exps", "a"=>[
+         {"t"=>"table", "s"=>"status"},
+         {"t"=>"dice", "s"=>"1d6"}]},
+       {"t"=>"sqs", "s"=>" orc"}],
 
     }.each do |k, v|
 
       it "parses #{k.inspect}" do
 
-        dump_tree(k, 2)
-
         t = evaluate("return MaboStringParser.parse(#{k.inspect});")
+
+        if t != v
+          dump_tree(k, 2)
+          puts; pp t
+          exit(1)
+        end
 
         expect(t).to eq(v)
       end

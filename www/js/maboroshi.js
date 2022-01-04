@@ -140,14 +140,15 @@ var MaboStringParser = Jaabro.makeParser(function() {
   //
   // parse
 
-  function pbstart(i) { return str(null, i, '{'); }
-  function pbend(i) { return str(null, i, '}'); }
-  function semco(i) { return str(null, i, ';'); }
+  function pbstart(i) { return rex(null, i, /\{\s*/); }
+  function pbend(i)   { return str(null, i, '}'); } // keep post space for sqs
   function colon(i) { return str(null, i, ':'); }
   function qmark(i) { return str(null, i, '?'); }
+  function semco(i) { return rex(null, i, /;\s*/); }
+  function atsig(i) { return rex(null, i, /@\s*/); }
 
-  function parstart(i) { return str(null, i, '('); }
-  function parend(i) { return str(null, i, ')'); }
+  function parstart(i) { return rex(null, i, /\(\s*/); }
+  function parend(i)   { return rex(null, i, /\)\s*/); }
 
   function nil(i) { return rex('nil', i, /nil|null/i); }
   function boo(i) { return rex('boo', i, /true|false/i); }
@@ -156,10 +157,16 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function sqstring(i) { return rex('sqs', i, /'([^']|\\')+'/); }
   function dqstring(i) { return rex('dqs', i, /"([^"]|\\")+"/); } // FIXME
 
-  function par(i) { return seq('par', i, parstart, exps, parend); }
+  function table(i) { return seq('table', i, atsig, vname); }
+
+  function dice(i) { return rex('dice', i, /\d+[dD]\d+/); }
+
+  //function par(i) { return seq('par', i, parstart, exps, parend); }
+  function par(i) { return str('par', i, '()'); } // FIXME
 
   function val(i) {
-    return alt('val', i, par, vname, sqstring, dqstring, num, boo, nil); }
+    return alt(null, i,
+      par, dice, vname, table, sqstring, dqstring, num, boo, nil); }
 
   function equal(i) { return rex('equ', i, /=/); }
 
@@ -188,30 +195,36 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
   var exp = eass;
 
-  function exps(i) { return eseq('exps', i, pbstart, exp, semco, pbend); }
+  function pbracket(i) { return eseq('exps', i, pbstart, exp, semco, pbend); }
 
-  function str(i) { return rex('str', i, /([^{]|\\{)+/); }
+  function str(i) { return rex('sqs', i, /([^{]|\\{)+/); }
 
-  function str_or_exps(i) { return alt(null, i, str, exps); }
+  function str_or_pbracket(i) { return alt(null, i, str, pbracket); }
 
-  function string(i) { return seq('string', i, str_or_exps, '*'); }
+  function string(i) { return seq('string', i, str_or_pbracket, '+'); }
   var root = string;
 
   //
   // rewrite
 
-  //function rewrite_string(t) {
-  //  return t.subgather().map(rewrite);
-  //}
-  //function rewrite_str(t) {
-  //  return { t: 'sqs', s: t.string() };
-  //};
-  //function rewrite_exps(t) {
-  //  return { t: 'exp', a: t.subgather().map(rewrite) };
-  //};
-  //function rewrite_exp(t) {
-  //  return { t: 'exp', a: [ t.string() ] };
-  //}
+  function _rewrite_s(t) { return { t: t.name, s: t.string() }; }
+
+  function rewrite_string(t) {
+    return t.subgather().map(rewrite); }
+
+  function rewrite_exps(t) {
+    return { t: 'exps', a: t.subgather().map(rewrite) }; }
+
+  function rewrite_exp(t) {
+    var a = t.subgather().map(rewrite);
+    if (a.length === 1) return a[0];
+    return { t: 'exp', a: a }; }
+
+  function rewrite_table(t) {
+    return { t: 'table', s: t.lookup('vname').string() }; }
+
+  var rewrite_sqs = _rewrite_s;
+  var rewrite_dice = _rewrite_s;
 }); // end MaboStringParser
 
 

@@ -6,6 +6,7 @@
 #
 
 require 'pp'
+require 'io/console'
 require 'json'
 require 'ferrum'
 
