@@ -246,6 +246,8 @@ var MaboTableSet = (function() {
 
     s.split(/\r\n|\r|\n/).forEach(function(l) {
 
+      if (l.trimStart().startsWith('<!--')) return;
+
       m = l.match(/^(#+)\s+(.+)$/);
       if (m) {
         if (n) { r.push({ name: n, type: t, lines: a }); n = null; a = []; }
@@ -373,7 +375,7 @@ var MaboTableSet = (function() {
 
     var r = { main: null, tables: {} };
     parseMdSplit(s).forEach(function(section) {
-      if (section.type === 'h1') r.main = section.name;
+      if (section.type === 'h1' && ! r.main) r.main = section.name;
       r.tables[section.name] = parseMdExpand(section);
     });
 

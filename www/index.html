@@ -700,6 +700,8 @@ var MaboTableSet = (function() {
 
     s.split(/\r\n|\r|\n/).forEach(function(l) {
 
+      if (l.trimStart().startsWith('<!--')) return;
+
       m = l.match(/^(#+)\s+(.+)$/);
       if (m) {
         if (n) { r.push({ name: n, type: t, lines: a }); n = null; a = []; }
@@ -827,7 +829,7 @@ var MaboTableSet = (function() {
 
     var r = { main: null, tables: {} };
     parseMdSplit(s).forEach(function(section) {
-      if (section.type === 'h1') r.main = section.name;
+      if (section.type === 'h1' && ! r.main) r.main = section.name;
       r.tables[section.name] = parseMdExpand(section);
     });
 
@@ -962,7 +964,7 @@ var QRCode;!function(){function t(t){this.mode=r.MODE_8BIT_BYTE,this.data=t,this
                 colorLight: '#ffffff',
                 correctLevel: QRCode.CorrectLevel.H });
 
-            var ve = H.elt('#codes .text img[src="images/copy.svg"]');
+            var ve = H.elt('#codes .text img.copy');
             ve._text = r;
             ve._what = 'text';
           });
@@ -997,11 +999,11 @@ var QRCode;!function(){function t(t){this.mode=r.MODE_8BIT_BYTE,this.data=t,this
             colorLight: '#ffffff',
             correctLevel: QRCode.CorrectLevel.H });
 
-        var ve = H.elt('#codes .self img[src="images/copy.svg"]');
+        var ve = H.elt('#codes .self img.copy');
         ve._text = window.location.href;
         ve._what = '"' + window.location.href + '"';
 
-        H.on('img[src="images/copy.svg"]', 'click', function(ev) {
+        H.on('img.copy', 'click', function(ev) {
           var ce = H.elt('#clip');
           var fe = H.elt('#flash');
           ce.value = ev.target._text;

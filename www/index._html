@@ -79,7 +79,7 @@
                 colorLight: '#ffffff',
                 correctLevel: QRCode.CorrectLevel.H });
 
-            var ve = H.elt('#codes .text img[src="images/copy.svg"]');
+            var ve = H.elt('#codes .text img.copy');
             ve._text = r;
             ve._what = 'text';
           });
@@ -114,11 +114,11 @@
             colorLight: '#ffffff',
             correctLevel: QRCode.CorrectLevel.H });
 
-        var ve = H.elt('#codes .self img[src="images/copy.svg"]');
+        var ve = H.elt('#codes .self img.copy');
         ve._text = window.location.href;
         ve._what = '"' + window.location.href + '"';
 
-        H.on('img[src="images/copy.svg"]', 'click', function(ev) {
+        H.on('img.copy', 'click', function(ev) {
           var ce = H.elt('#clip');
           var fe = H.elt('#flash');
           ce.value = ev.target._text;
