@@ -32,7 +32,9 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function tname(i) { return rex('tname', i, /[^;}]+/); } // FIXME
   function table(i) { return seq('table', i, atsig, tname); }
 
-  function dice(i) { return rex('dice', i, /\d+[dD]\d+/); }
+  function ddice(i) { return rex('ddice', i, /([dD]\d+)+/); }
+  function cdice(i) { return rex('cdice', i, /\d+[dD]\d+/); }
+  function dice(i) { return alt('dice', i, cdice, ddice); }
 
   //function par(i) { return seq('par', i, parstart, exps, parend); }
   function par(i) { return str('par', i, '()'); } // FIXME
@@ -98,13 +100,6 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
     var a = t.subgather().map(rewrite);
 
-    //var ass = t.lookup('heass'); if (ass) {
-    //  return { t: 'ass', v: ass.lookup('vname').string(), a: a.slice(1) }; }
-
-    //var ter = t.lookup('heter'); if (ter) {
-    //  var aa = [ -1 ];
-    //  return { t: 'ter', a: aa }; }
-
     if (a.length === 1) return a[0];
     return { t: 'exp', a: a }; }
 
@@ -118,9 +113,21 @@ var MaboStringParser = Jaabro.makeParser(function() {
     return { t: 'num', n: parseInt(t.string(), 10) }; }
 
   var rewrite_sqs = _rewrite_s;
-  var rewrite_dice = _rewrite_s;
   var rewrite_vname = _rewrite_s;
   var rewrite_sop = _rewrite_st;
+
+  function rewrite_cdice(t) {
+    var m = t.string().match(/^(\d+)[dD](\d+)$/);
+    return { t: 'dice', c: parseInt(m[1], 10), d: parseInt(m[2], 10) }; }
+
+  function rewrite_ddice(t) {
+    var ds = t.string()
+      .split(/[dD]/)
+      .slice(1)
+      .map(function(e) { return parseInt(e, 10); });
+    return { t: 'dice', ds: ds }; }
+
+  function rewrite_dice(t) { return rewrite(t.children[0]); }
 
 }); // end MaboStringParser
 
@@ -158,10 +165,13 @@ var MaboTableSet = (function() {
     return t.roll(); };
 
   evals.dice = function(set, n) {
-    var m = n.s.match(/^(\d+)[dD](\d+)$/);
-    var c = parseInt(m[1], 10); var d = parseInt(m[2], 10);
+    if (n.ds) {
+      r = '';
+      n.ds.forEach(function(d) { r = r + random(d); });
+      return parseInt(r, 10);
+    }
     var r = 0;
-    for (var i = 0; i < c; i++) { r = r + random(d); }
+    for (var i = 0; i < n.c; i++) { r = r + random(n.d); }
     return r; };
 
   evals.num = function(set, n) {

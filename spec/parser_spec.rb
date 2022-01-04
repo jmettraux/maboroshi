@@ -30,9 +30,9 @@ describe 'MaboStringParser' do
         {"t"=>"sqs", "s"=>" goblin"}],
 
       "{@ status; 1d6} orc" => [
-        {"t"=>"exps", "a"=>[
+        {"t"=>"exps", "a"=> [
           {"t"=>"table", "s"=>"status"},
-          {"t"=>"dice", "s"=>"1d6"}]},
+          {"t"=>"dice", 'c' => 1, 'd' => 6 } ] },
         {"t"=>"sqs", "s"=>" orc"}],
 
       "{a = 1}" => [
@@ -116,13 +116,19 @@ describe 'MaboStringParser' do
              "a"=>
               [{"t"=>"num", "n"=>10},
                {"t"=>"sop", "s"=>"+"},
-               {"t"=>"dice", "s"=>"1d6"},
+               {"t"=>"dice", 'c' => 1, 'd' => 6 },
                {"t"=>"sop", "s"=>"-"},
                {"t"=>"exp",
                 "a"=>
                  [{"t"=>"num", "n"=>2},
                   {"t"=>"sop", "s"=>"*"},
                   {"t"=>"num", "n"=>3}]}]}]}],
+
+      "{d6d6}" =>
+        [{"t"=>"exps", "a"=>[{"t"=>"dice", "ds"=>[6, 6]}]}],
+
+      "{2d66}" =>
+        [{"t"=>"exps", "a"=>[{"t"=>"dice", "c"=>2, "d"=>66}]}],
 
       "{10 % 3}" =>
         [{"t"=>"exps",
