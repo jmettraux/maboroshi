@@ -3,135 +3,6 @@
 
 
 //
-// MaboDice
-////////////////////////////////////////////////////////////////////////////////
-
-var MaboDice = (function() {
-
-  "use strict";
-
-  var self = this;
-
-  // protected functions
-
-  var parseDice = function(s) {
-
-    var m = s.match(/^\s*(\d*)d(\d+)(.*)$/);
-    if ( ! m) return null;
-    var c = m[1]; c = (c === '') ? 1 : parseInt(m[1], 10);
-    var d = parseInt(m[2], 10);
-
-    return [ { c: c, d: d }, m[m.length - 1] ];
-  };
-
-  var parseOperation = function(s) {
-
-    var m = s.match(/^\s*([-+])\s*(.*)$/);
-    if ( ! m) return null;
-
-    return [ m[1], m[m.length - 1] ];
-  };
-
-  var parseNumber = function(s) {
-
-    var m = s.match(/^\s*(-?\d+)\s*(.*)$/);
-    if ( ! m) return null;
-
-    return [ parseInt(m[1], 10), m[m.length - 1] ];
-  };
-
-  var random = function(max) {
-    return 1 + Math.floor(Math.random() * (max - 1));
-  };
-
-  // public functions
-
-  this.parse = function(s) {
-
-    var s1 = '' + s;
-    var a = [];
-
-    while(s1.length > 0) {
-
-      var r =
-        parseDice(s1) || parseNumber(s1) || parseOperation(s1);
-      if ( ! r) break;
-
-      var l = a.slice(-1)[0];
-
-      var r0 = r[0];
-      if (typeof r0 === 'number' && r0 < 0 && typeof l !== 'string') {
-        a.push('+');
-      }
-      a.push(r0);
-
-      s1 = r[1];
-    }
-
-    return a.length < 1 ? null : a;
-  };
-
-  this.roll = function(s) {
-
-    var ds = self.parse(s);
-
-    var a = []
-
-    ds.forEach(function(e) {
-
-      var r = e;
-
-      if (typeof e === 'number') {
-      }
-      else if (typeof e === 'string') {
-      }
-      else {
-        r = 0; for (var i = 0; i < e.c; i++) { r = r + random(e.d); }
-      }
-
-      a.push(r);
-    });
-
-    var r = null;
-    var op = 'cat';
-
-    a.forEach(function(e) {
-
-      if (typeof e === 'number') {
-        if (op === 'cat') {
-          r = parseInt('' + (r || '') + e, 10);
-        }
-        else if (op === '+') {
-          r = (r || 0) + e;
-          op = 'cat';
-        }
-        else if (op === '-') {
-          r = (r || 0) - e;
-          op = 'cat';
-        }
-        else if (typeof op === 'string') {
-          r = r || 0;
-          if (op === '+') { r = r + e; }
-          else { r = r - e; }
-          op = 'cat';
-        }
-      }
-      else if (typeof e === 'string') {
-        op = e;
-      }
-    });
-
-    return r;
-  };
-
-  // done.
-
-  return this;
-
-}).apply({}); // end Dice
-
-
-//
 // MaboStringParser
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -144,8 +15,8 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function pbend(i)   { return str(null, i, '}'); } // keep post space for sqs
   function colon(i) { return rex(null, i, /\s*:\s*/); }
   function qmark(i) { return rex(null, i, /\s*\?\s*/); }
-  function semco(i) { return rex(null, i, /;\s*/); }
-  function atsig(i) { return rex(null, i, /@\s*/); }
+  function semco(i) { return rex(null, i, /\s*;\s*/); }
+  function atsig(i) { return rex(null, i, /\s*@\s*/); }
   function equal(i) { return rex(null, i, /\s*=(?!=)\s*/); }
 
   function parstart(i) { return rex(null, i, /\(\s*/); }
@@ -158,7 +29,8 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function sqstring(i) { return rex('sqs', i, /'([^']|\\')+'/); }
   function dqstring(i) { return rex('dqs', i, /"([^"]|\\")+"/); } // FIXME
 
-  function table(i) { return seq('table', i, atsig, vname); }
+  function tname(i) { return rex('tname', i, /[^;}]+/); } // FIXME
+  function table(i) { return seq('table', i, atsig, tname); }
 
   function dice(i) { return rex('dice', i, /\d+[dD]\d+/); }
 
@@ -240,7 +112,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
   var rewrite_heter = _rewrite_nsub;
 
   function rewrite_table(t) {
-    return { t: 'table', s: t.lookup('vname').string() }; }
+    return { t: 'table', s: t.lookup('tname').string() }; }
 
   function rewrite_num(t) {
     return { t: 'num', n: parseInt(t.string(), 10) }; }
@@ -265,60 +137,77 @@ var MaboTableSet = (function() {
 
   // protected functions
 
-  //var random = function(max) {
-  //  return 1 + Math.floor(Math.random() * (max - 1));
-  //};
+  var random = function(max) {
+    return 1 + Math.floor(Math.random() * (max - 1)); };
 
-  var doEvalReference = async function(set, s) {
+  var evals = {};
 
-//clog('doEvalReference()', set, [ s ]);
-    var t = set.tables[s];
+  evals.exps = function(set, n) {
+    var r = null;
+    n.a.forEach(function(nn) { r = evalNode(set, nn); });
+    return r; };
 
+  evals.sqs = function(set, n) {
+    return n.s; };
+
+  evals.table = async function(set, n) {
+    var t = set.tables[n.s];
     if (t) return rollOnListTable(set, t);
+    if ( ! n.s.match(/\.md/)) throw 'unknown table "' + n.s + '"';
+    t = await MaboTableSet.make(n.s);
+    return t.roll(); };
 
-    if ( ! s.match(/\.md/)) throw 'unknown table "' + s + '"';
+  evals.dice = function(set, n) {
+    var m = n.s.match(/^(\d+)[dD](\d+)$/);
+    var c = parseInt(m[1], 10); var d = parseInt(m[2], 10);
+    var r = 0;
+    for (var i = 0; i < c; i++) { r = r + random(d); }
+    return r; };
 
-    t = await MaboTableSet.make(s);
+  evals.num = function(set, n) {
+    return n.n; }
 
-    return t.roll();
+  evals.sum = function(set, n) {
+//clog('evals.sum', n);
+    var mod = 1;
+    var r = 0;
+    for (var i = 0, l = n.a.length; i < l; i++) {
+      var e = n.a[i];
+      if (e.t === 'sop') mod = e.s === '+' ? 1 : -1;
+      else r = r + mod * evalNode(set, e);
+    }
+    return r;
   };
 
-  var doEvalString = function(set, s) {
+  evals.exp = function(set, n) {
+    var op = n.a[1].s;
+    if (op === '%') return evals.mod(set, n);
+    if (op === '+' || op === '-') return evals.sum(set, n);
+    if (op === '/' || op === '*') return evals.prd(set, n);
+    if (op.match(/^>=?|<=?$/)) return evals.lgt(set, n);
+    throw "evals. op " + op + " not implemented."; };
 
-//clog('doEvalString()', s);
-    if (s.slice(0, 1) === '@') {
-      return doEvalReference(set, s.slice(1).trim());
-    }
+  var evalNode = function(set, n) {
 
-    var d = MaboDice.parse(s);
-//clog('doEvalString()', 'd', d);
-    if (d) return '' + MaboDice.roll(s);
-  }
+clog('evalNode()', n);
+    var ev = evals[n.t];
+    if ( ! ev) throw "evals." + n.t + " not implemented.";
+    return ev(set, n);
+  };
 
   var evalString = async function(set, s) {
 
 //clog('evalString()', s);
-    var a = [];
-    var s1 = s;
-
-    while (true) {
-      var m = s1.match(/^(\{[^}]+\})(.*)$/s) || s1.match(/^([^{]+)(.*)$/s);
-        // not the /s suffix to the regex!
-      if ( ! m) break;
-      a.push(m[1]); s1 = m[2];
-    }
+    var t = MaboStringParser.parse(s);
+    if ( ! t) throw "failed to parse \"" + s + "\"";
 
     var a1 = [];
       //
-    for (var i = 0, l = a.length; i < l; i++) { // use a loop not a .map
-      var e = a[i];
-      var m = e.match(/^\{\s*(.+)\s*\}$/);
-      if ( ! m) { a1.push(e); continue; }
-      var e1 = await doEvalString(set, m[1]);
-      a1.push(e1);
+    for (var i = 0, l = t.length; i < l; i++) {
+      a1.push(await evalNode(set, t[i]));
     }
 
-    return a1.join('').replaceAll(/\n\|\n/g, '\n\n');
+    return a1.join('');
   };
 
   var rollOnListTable = function(set, table) {
