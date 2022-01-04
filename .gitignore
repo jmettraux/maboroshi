@@ -4,8 +4,7 @@
 .rspec.out
 .vimspec
 
-.vimrc
-.viminfo
+.vim*
 
 spec/.source.js
 
