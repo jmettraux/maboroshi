@@ -35,14 +35,14 @@
         <div class="code"></div>
         <div class="label">
           self
-          <img src="images/copy.svg"></img>
+          <!-- COPY-IMAGE -->
         </div>
       </div>
       <div class="text">
         <div class="code"></div>
         <div class="label">
           text
-          <img src="images/copy.svg"></img>
+          <!-- COPY-IMAGE -->
         </div>
       </div>
     </div>

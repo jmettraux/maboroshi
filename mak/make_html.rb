@@ -12,12 +12,16 @@ script = %w[
   www/js/h.min.js
   www/js/qrcode.min.js ]
     .inject('') { |s, path| s + "\n" + File.read(path) }
+svg =
+  File.read('www/images/copy.uri')
 
 i = html.index('/** STYLE **/')
 html.insert(i + 13, style);
 
 i = html.index('/** SCRIPT **/')
 html.insert(i + 14, script);
+
+html.gsub!('<!-- COPY-IMAGE -->', "<img class=\"copy\" src=\"#{svg}\"></img>");
 
 File.open('www/index.html', 'wb') { |f| f.write(html) }
 

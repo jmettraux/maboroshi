@@ -22,7 +22,7 @@ pre {
   position: relative;
 }
 
-img[src="images/copy.svg"] {
+img.copy {
   height: 16pt;
   position: absolute;
   right: 0;
