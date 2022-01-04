@@ -42,6 +42,8 @@ describe 'MaboStringParser' do
 
       it "parses #{k.inspect}" do
 
+        dump_tree(k, 2)
+
         t = evaluate("return MaboStringParser.parse(#{k.inspect});")
 
         expect(t).to eq(v)

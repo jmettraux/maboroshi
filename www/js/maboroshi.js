@@ -200,26 +200,18 @@ var MaboStringParser = Jaabro.makeParser(function() {
   //
   // rewrite
 
-  function rewrite_string(t) {
-
-    return t.subgather().map(rewrite);
-  }
-
-  function rewrite_str(t) {
-
-    return { t: 'sqs', s: t.string() };
-  };
-
-  function rewrite_exps(t) {
-
-    return { t: 'exp', a: t.subgather().map(rewrite) };
-  };
-
-  function rewrite_exp(t) {
-
-    return { t: 'exp', a: [ t.string() ] };
-  }
-
+  //function rewrite_string(t) {
+  //  return t.subgather().map(rewrite);
+  //}
+  //function rewrite_str(t) {
+  //  return { t: 'sqs', s: t.string() };
+  //};
+  //function rewrite_exps(t) {
+  //  return { t: 'exp', a: t.subgather().map(rewrite) };
+  //};
+  //function rewrite_exp(t) {
+  //  return { t: 'exp', a: [ t.string() ] };
+  //}
 }); // end MaboStringParser
 
 
