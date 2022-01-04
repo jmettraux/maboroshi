@@ -1,7 +1,7 @@
 
 # 幻  Maboroshi
 
-explanation: https://weaver.skeptic.h/20220104.html?t=Quick_Random_Table&f=gh
+explanation: https://weaver.skepti.ch/20220104.html?t=Quick_Random_Table&f=gh
 
 
 ## sample table
