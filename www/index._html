@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8" />
+    <!--meta name="viewport" content="width=device-width, initial-scale=1" /-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+
+    <title>幻 maboroshi</title>
+
+    <style>
+/** STYLE **/
+    </style>
+
+    <script>
+/** SCRIPT **/
+    </script>
+  </head>
+
+  <body>
+
+    <pre id="result">
+    </pre>
+
+    <div id="directory">
+      <ul>
+<!-- DIRECTORY -->
+      </ul>
+    </div>
+
+    <div id="codes">
+      <div class="self">
+        <div class="code"></div>
+        <div class="label">
+          self
+          <img src="images/copy.svg"></img>
+        </div>
+      </div>
+      <div class="text">
+        <div class="code"></div>
+        <div class="label">
+          text
+          <img src="images/copy.svg"></img>
+        </div>
+      </div>
+    </div>
+
+    <div id="flash" style="display: none;">flash</div>
+
+    <textarea id="clip"></textarea>
+
+    <script>
+
+      var clog = console.log;
+      var cerr = console.error;
+
+      var qrwidth = 168;
+
+      var roll = function(table) {
+
+        table.roll()
+          .then(function(r) {
+
+            H.setText('#result', r);
+            H.unhide('#result');
+
+            //var qt = r
+            //  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            //  .slice(0, 4 * 1024);
+
+            new QRCode(
+              H.elt('#codes .text .code'),
+              { text: r,
+                width: qrwidth,
+                height: qrwidth,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H });
+
+            var ve = H.elt('#codes .text img[src="images/copy.svg"]');
+            ve._text = r;
+            ve._what = 'text';
+          });
+      };
+
+      H.onDocumentReady(function() {
+
+        H.hide('#result');
+
+        var ss = window.location.search
+          .split(/[?&]/)
+          .filter(function(e) { return e.length > 0; });
+        var table = ss.find(function(e) { return e.match(/^table=.+/); });
+
+        if (table) {
+
+          H.hide('#directory');
+
+          var u = decodeURIComponent(table.slice(6));
+
+          MaboTableSet.make(u)
+            .then(roll)
+            .catch(function(e) { cerr(e); })
+        }
+
+        new QRCode(
+          H.elt('#codes .self .code'),
+          { text: window.location.href,
+            width: qrwidth,
+            height: qrwidth,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H });
+
+        var ve = H.elt('#codes .self img[src="images/copy.svg"]');
+        ve._text = window.location.href;
+        ve._what = '"' + window.location.href + '"';
+
+        H.on('img[src="images/copy.svg"]', 'click', function(ev) {
+          var ce = H.elt('#clip');
+          var fe = H.elt('#flash');
+          ce.value = ev.target._text;
+          ce.select();
+          document.execCommand('copy');
+          window.setTimeout(function() { ce.blur(); }, 100);
+          fe.textContent = ev.target._what + " copied";
+          fe.style.display = 'block';
+          window.setTimeout(function() { fe.style.display = 'none'; }, 2100);
+        });
+      });
+    </script>
+  </body>
+</html>
+

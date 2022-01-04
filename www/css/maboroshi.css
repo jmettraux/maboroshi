@@ -2,6 +2,7 @@
 body {
   font-size: 12pt;
   font-family: monospace;
+  margin: 0.5rem;
 }
 
 .hidden { display: none; }

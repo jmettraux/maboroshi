@@ -10,6 +10,7 @@
 ## libraries used
 
 * https://github.com/KeeeX/qrcodejs
+* https://github.com/necolas/normalize.css
 
 
 ## license
