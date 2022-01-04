@@ -146,7 +146,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function qmark(i) { return rex(null, i, /\s*\?\s*/); }
   function semco(i) { return rex(null, i, /;\s*/); }
   function atsig(i) { return rex(null, i, /@\s*/); }
-  function equal(i) { return rex(null, i, /\s*=\s*/); }
+  function equal(i) { return rex(null, i, /\s*=(?!=)\s*/); }
 
   function parstart(i) { return rex(null, i, /\(\s*/); }
   function parend(i)   { return rex(null, i, /\)\s*/); }
@@ -171,13 +171,13 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
   function vname(i) { return rex('vname', i, /[a-zA-Z][a-zA-Z0-9_]*/); }
 
-  function semod(i) { return rex('sop', i, /%/); }
-  function seprd(i) { return rex('sop', i, /[\*\/]/); }
-  function sesum(i) { return rex('sop', i, /[+-]/); }
-  function selgt(i) { return rex('sop', i, /<=?|>=?/); }
-  function seequ(i) { return rex('sop', i, /===?/); }
-  function seand(i) { return str('sop', i, '&&'); }
-  function seorr(i) { return str('sop', i, '||'); }
+  function semod(i) { return rex('sop', i, /\s*%\s*/); }
+  function seprd(i) { return rex('sop', i, /\s*[\*\/]\s*/); }
+  function sesum(i) { return rex('sop', i, /\s*[+-]\s*/); }
+  function selgt(i) { return rex('sop', i, /\s*(<=?|>=?)\s*/); }
+  function seequ(i) { return rex('sop', i, /\s*===?\s*/); }
+  function seand(i) { return rex('sop', i, /\s*&&\s*/); }
+  function seorr(i) { return rex('sop', i, /\s*\|\|\s*/); }
 
   function heter(i) { return seq('heter', i, eorr, qmark, eorr, colon); }
   function heass(i) { return seq('heass', i, vname, equal); }
@@ -210,6 +210,8 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
   function _rewrite_s(t) {
     return { t: t.name, s: t.string() }; }
+  function _rewrite_st(t) {
+    return { t: t.name, s: t.string().trim() }; }
   function _rewrite_sub(t) {
     return t.subgather().map(rewrite); }
   function _rewrite_nsub(t) {
@@ -246,6 +248,8 @@ var MaboStringParser = Jaabro.makeParser(function() {
   var rewrite_sqs = _rewrite_s;
   var rewrite_dice = _rewrite_s;
   var rewrite_vname = _rewrite_s;
+  var rewrite_sop = _rewrite_st;
+
 }); // end MaboStringParser
 
 

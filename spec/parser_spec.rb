@@ -80,6 +80,75 @@ describe 'MaboStringParser' do
                    "a"=>[{"t"=>"vname", "s"=>"a"}, {"t"=>"vname", "s"=>"b"}]},
                   {"t"=>"vname", "s"=>"c"}]}]}]}],
 
+      "{a || b}" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"exp",
+             "a"=>
+              [{"t"=>"vname", "s"=>"a"},
+               {"t"=>"sop", "s"=>"||"},
+               {"t"=>"vname", "s"=>"b"}]}]}],
+
+      "{a == b}" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"exp",
+             "a"=>
+              [{"t"=>"vname", "s"=>"a"},
+               {"t"=>"sop", "s"=>"=="},
+               {"t"=>"vname", "s"=>"b"}]}]}],
+
+      "{a >= b < c}" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"exp",
+             "a"=>
+              [{"t"=>"vname", "s"=>"a"},
+               {"t"=>"sop", "s"=>">="},
+               {"t"=>"vname", "s"=>"b"},
+               {"t"=>"sop", "s"=>"<"},
+               {"t"=>"vname", "s"=>"c"}]}]}],
+
+      "{10 + 1d6 - 2 * 3}" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"exp",
+             "a"=>
+              [{"t"=>"num", "n"=>10},
+               {"t"=>"sop", "s"=>"+"},
+               {"t"=>"dice", "s"=>"1d6"},
+               {"t"=>"sop", "s"=>"-"},
+               {"t"=>"exp",
+                "a"=>
+                 [{"t"=>"num", "n"=>2},
+                  {"t"=>"sop", "s"=>"*"},
+                  {"t"=>"num", "n"=>3}]}]}]}],
+
+      "{10 % 3}" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"exp",
+             "a"=>
+              [{"t"=>"num", "n"=>10},
+               {"t"=>"sop", "s"=>"%"},
+               {"t"=>"num", "n"=>3}]}]}],
+
+      "{a = @ table}" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"exp",
+             "a"=>
+              [{"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"a"}]},
+               {"t"=>"table", "s"=>"table"}]}]}],
+
+      "{a = 'a small single quoted string}\"'}" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"exp",
+             "a"=>
+              [{"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"a"}]},
+               {"t"=>"sqs", "s"=>"'a small single quoted string}\"'"}]}]}],
+
     }.each do |k, v|
 
       it "parses #{k.inspect}" do
