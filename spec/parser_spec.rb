@@ -35,6 +35,9 @@ describe 'MaboStringParser' do
           { "s" => " 1d6", "t" => "exp" } ] },
         { "s"=>" orc", "t"=>"sqs" } ],
 
+      "{@ name}" => [
+        ],
+
     }.each do |k, v|
 
       it "parses #{k.inspect}" do

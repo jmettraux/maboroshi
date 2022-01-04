@@ -143,15 +143,58 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function pbstart(i) { return str(null, i, '{'); }
   function pbend(i) { return str(null, i, '}'); }
   function semco(i) { return str(null, i, ';'); }
+  function colon(i) { return str(null, i, ':'); }
+  function qmark(i) { return str(null, i, '?'); }
 
-  function exp(i) { return rex('exp', i, /[^;}]+/); }
+  function parstart(i) { return str(null, i, '('); }
+  function parend(i) { return str(null, i, ')'); }
 
-  function code(i) { return eseq('code', i, pbstart, exp, semco, pbend); }
+  function nil(i) { return rex('nil', i, /nil|null/i); }
+  function boo(i) { return rex('boo', i, /true|false/i); }
+  function num(i) { return rex('num', i, /\d+/); }
+
+  function sqstring(i) { return rex('sqs', i, /'([^']|\\')+'/); }
+  function dqstring(i) { return rex('dqs', i, /"([^"]|\\")+"/); } // FIXME
+
+  function par(i) { return seq('par', i, parstart, exps, parend); }
+
+  function val(i) {
+    return alt('val', i, par, vname, sqstring, dqstring, num, boo, nil); }
+
+  function equal(i) { return rex('equ', i, /=/); }
+
+  function vname(i) { return rex('vname', i, /[a-zA-Z][a-zA-Z0-9_]+/); }
+
+  function semod(i) { return rex('sop', i, /%/); }
+  function seprd(i) { return rex('sop', i, /[\*\/]/); }
+  function sesum(i) { return rex('sop', i, /[+-]/); }
+  function selgt(i) { return rex('sop', i, /<=?|>=?/); }
+  function seequ(i) { return rex('sop', i, /===?/); }
+  function seand(i) { return str('sop', i, '&&'); }
+  function seorr(i) { return str('sop', i, '||'); }
+
+  function heter(i) { return seq('heter', i, eorr, qmark, eorr, colon); }
+  function heass(i) { return seq('heass', i, vname, equal); }
+
+  function emod(i) { return jseq('exp', i, val, semod); }
+  function eprd(i) { return jseq('exp', i, emod, seprd); }
+  function esum(i) { return jseq('exp', i, eprd, sesum); }
+  function elgt(i) { return jseq('exp', i, esum, selgt); }
+  function eequ(i) { return jseq('exp', i, elgt, seequ); }
+  function eand(i) { return jseq('exp', i, eequ, seand); }
+  function eorr(i) { return jseq('exp', i, eand, seorr); }
+  function eter(i) { return seq('exp', i, heter, '*', eorr); }
+  function eass(i) { return seq('exp', i, heass, '*', eter); }
+
+  var exp = eass;
+
+  function exps(i) { return eseq('exps', i, pbstart, exp, semco, pbend); }
+
   function str(i) { return rex('str', i, /([^{]|\\{)+/); }
 
-  function code_or_str(i) { return alt(null, i, code, str); }
+  function str_or_exps(i) { return alt(null, i, str, exps); }
 
-  function string(i) { return seq('string', i, code_or_str, '*'); }
+  function string(i) { return seq('string', i, str_or_exps, '*'); }
   var root = string;
 
   //
@@ -167,14 +210,14 @@ var MaboStringParser = Jaabro.makeParser(function() {
     return { t: 'sqs', s: t.string() };
   };
 
-  function rewrite_code(t) {
+  function rewrite_exps(t) {
 
-    return { t: 'cod', a: t.subgather().map(rewrite) };
+    return { t: 'exp', a: t.subgather().map(rewrite) };
   };
 
   function rewrite_exp(t) {
 
-    return { t: 'exp', s: t.string() };
+    return { t: 'exp', a: [ t.string() ] };
   }
 
 }); // end MaboStringParser
