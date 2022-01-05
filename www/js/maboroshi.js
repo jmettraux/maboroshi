@@ -155,7 +155,7 @@ var MaboTableSet = (function() {
     return r; };
 
   evals.sqs = function(set, n) {
-    return n.s; };
+    return n.s.slice(1, -1); };
 
   evals.vname = function(set, n) {
     if (n.s.match(/^[A-Z][A-Z0-9_]*$/)) {

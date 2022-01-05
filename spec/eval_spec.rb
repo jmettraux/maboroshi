@@ -33,6 +33,9 @@ describe 'MaboTableSet' do
       '{3 * 12}' => 36,
       '{12 / 3}' => 4,
 
+      "{'abc'}" => 'abc',
+      "{'abc\"def'}" => 'abc"def',
+
     }.each do |k, v|
 
       it "evals #{k.inspect}" do
