@@ -192,6 +192,17 @@ var MaboTableSet = (function() {
   evals.num = function(set, n) {
     return n.n; }
 
+  evals.prd = function(set, n) {
+    var mod = 1;
+    var r = 1;
+    for (var i = 0, l = n.a.length; i < l; i++) {
+      var e = n.a[i];
+      if (e.t === 'sop') mod = e.s === '*' ? 1 : -1;
+      else r = r * Math.pow(evalNode(set, e), mod);
+    }
+    return r;
+  }
+
   evals.sum = function(set, n) {
 //clog('evals.sum', n);
     var mod = 1;
