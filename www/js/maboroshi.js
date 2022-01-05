@@ -157,6 +157,20 @@ var MaboTableSet = (function() {
   evals.sqs = function(set, n) {
     return n.s; };
 
+  evals.vname = function(set, n) {
+    if (n.s.match(/^[A-Z][A-Z0-9_]*$/)) {
+      var root = set; while (root.parent) root = root.parent;
+      return root.vars[n.s];
+    }
+    else {
+      var s = set;
+      while (true) {
+        if (s.vars.hasOwnProperty(n.s)) return s.vars[n.s];
+        s = s.parent; if ( ! s) break;
+      }
+      return null;
+    } };
+
   evals.table = async function(set, n) {
     var t = set.tables[n.s];
     if (t) return rollOnListTable(set, t);

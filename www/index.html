@@ -616,11 +616,26 @@ var MaboTableSet = (function() {
   evals.sqs = function(set, n) {
     return n.s; };
 
+  evals.vname = function(set, n) {
+    if (n.s.match(/^[A-Z][A-Z0-9_]*$/)) {
+      var root = set; while (root.parent) root = root.parent;
+      return root.vars[n.s];
+    }
+    else {
+      var s = set;
+      while (true) {
+        if (s.vars.hasOwnProperty(n.s)) return s.vars[n.s];
+        s = s.parent; if ( ! s) break;
+      }
+      return null;
+    } };
+
   evals.table = async function(set, n) {
     var t = set.tables[n.s];
     if (t) return rollOnListTable(set, t);
     if ( ! n.s.match(/\.md/)) throw 'unknown table "' + n.s + '"';
     t = await MaboTableSet.make(n.s);
+    t.parent = set;
     return t.roll(); };
 
   evals.dice = function(set, n) {
@@ -861,7 +876,7 @@ var MaboTableSet = (function() {
 
   var parseMd = function(s) {
 
-    var r = { main: null, tables: {} };
+    var r = { main: null, tables: {}, vars: {}, parent: null };
     parseMdSplit(s).forEach(function(section) {
       if (section.type === 'h1' && ! r.main) r.main = section.name;
       r.tables[section.name] = parseMdExpand(section);
