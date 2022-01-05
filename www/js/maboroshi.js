@@ -34,7 +34,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function table(i) { return seq('table', i, atsig, tname); }
 
   function ddice(i) { return rex('ddice', i, /([dD]\d+)+/); }
-  function cdice(i) { return rex('cdice', i, /\d+[dD]\d+/); }
+  function cdice(i) { return rex('cdice', i, /\d+[dD]\d+(k[hl]\d*)?/); }
   function dice(i) { return alt('dice', i, cdice, ddice); }
 
   //function par(i) { return seq('par', i, parstart, exps, parend); }
@@ -118,8 +118,11 @@ var MaboStringParser = Jaabro.makeParser(function() {
   var rewrite_sop = _rewrite_st;
 
   function rewrite_cdice(t) {
-    var m = t.string().match(/^(\d+)[dD](\d+)$/);
-    return { t: 'dice', c: parseInt(m[1], 10), d: parseInt(m[2], 10) }; }
+    var m = t.string().match(/^(\d+)[dD](\d+)(k[hl]\d*)?$/);
+    var r = { t: 'dice', c: parseInt(m[1], 10), d: parseInt(m[2], 10) };
+    m = m[3] && m[3].match(/^(k[hl])(\d*)$/);
+    if (m) r[m[1]] = m[2].length > 0 ? parseInt(m[2], 10) : 1;
+    return r; }
 
   function rewrite_ddice(t) {
     var ds = t.string()
