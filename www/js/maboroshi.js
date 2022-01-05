@@ -189,13 +189,32 @@ var MaboTableSet = (function() {
     return r;
   };
 
-  evals.exp = function(set, n) {
+  evals._op = function(set, n) {
     var op = n.a[1].s;
     if (op === '%') return evals.mod(set, n);
     if (op === '+' || op === '-') return evals.sum(set, n);
     if (op === '/' || op === '*') return evals.prd(set, n);
     if (op.match(/^>=?|<=?$/)) return evals.lgt(set, n);
     throw "evals. op " + op + " not implemented."; };
+
+  evals._ass = function(set, n) {
+    var l = n.a.length;
+    var vnames = [];
+    for (var i = 0; i < l; i++) {
+      var nn = n.a[i]; if (nn.t !== 'heass') break;
+      vnames.push(nn.a[0].s);
+    }
+    var val = evalNode(set, n.a[l - 1]);
+    var root = set; while(root.parent) root = root.parent;
+    vnames.forEach(function(vn) {
+      if (vn.match(/^[A-Z][A-Z0-9_]*$/)) set.vars[vn] = val;
+      else root.vars[vn] = val;
+    });
+    return val; };
+
+  evals.exp = function(set, n) {
+    if (n.a[0].t === 'heass') return evals._ass(set, n);
+    return evals._op(set, n); };
 
   var evalNode = function(set, n) {
 
@@ -397,8 +416,9 @@ var MaboTableSet = (function() {
   this.debugEval = function(s) {
 
     var t = MaboStringParser.parse(s);
+    var h = arguments[1] || { vars: {} };
 
-    return evalNode(null, t[0]);
+    return [ evalNode(h, t[0]), h ];
   };
 
   this.doMake = function(uri, s) {
