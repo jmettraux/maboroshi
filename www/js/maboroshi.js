@@ -162,6 +162,7 @@ var MaboTableSet = (function() {
     if (t) return rollOnListTable(set, t);
     if ( ! n.s.match(/\.md/)) throw 'unknown table "' + n.s + '"';
     t = await MaboTableSet.make(n.s);
+    t.parent = set;
     return t.roll(); };
 
   evals.dice = function(set, n) {
@@ -402,7 +403,7 @@ var MaboTableSet = (function() {
 
   var parseMd = function(s) {
 
-    var r = { main: null, tables: {} };
+    var r = { main: null, tables: {}, vars: {}, parent: null };
     parseMdSplit(s).forEach(function(section) {
       if (section.type === 'h1' && ! r.main) r.main = section.name;
       r.tables[section.name] = parseMdExpand(section);
