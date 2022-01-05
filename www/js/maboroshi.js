@@ -394,6 +394,13 @@ var MaboTableSet = (function() {
 
   // public functions
 
+  this.debugEval = function(s) {
+
+    var t = MaboStringParser.parse(s);
+
+    return evalNode(null, t[0]);
+  };
+
   this.doMake = function(uri, s) {
 
     return addFunctions(parseMd(s));
