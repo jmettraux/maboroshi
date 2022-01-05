@@ -11,13 +11,14 @@ var MaboStringParser = Jaabro.makeParser(function() {
   //
   // parse
 
-  function pbstart(i) { return rex(null, i, /\{\s*/); }
-  function pbend(i)   { return str(null, i, '}'); } // keep post space for sqs
   function colon(i) { return rex(null, i, /\s*:\s*/); }
   function qmark(i) { return rex(null, i, /\s*\?\s*/); }
   function semco(i) { return rex(null, i, /\s*;\s*/); }
   function atsig(i) { return rex(null, i, /\s*@\s*/); }
   function equal(i) { return rex(null, i, /\s*=(?!=)\s*/); }
+
+  function pbstart(i) { return rex(null, i, /\{[;\s]*/); }
+  function pbend(i)   { return rex(null, i, /[;\s]*\}/); }
 
   function parstart(i) { return rex(null, i, /\(\s*/); }
   function parend(i)   { return rex(null, i, /\)\s*/); }
@@ -70,7 +71,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
   function pbracket(i) { return eseq('exps', i, pbstart, exp, semco, pbend); }
 
-  function str(i) { return rex('sqs', i, /([^{]|\\{)+/); }
+  function str(i) { return rex('sqs', i, /([^{]|\\{)+/s); }
 
   function str_or_pbracket(i) { return alt(null, i, str, pbracket); }
 

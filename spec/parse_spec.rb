@@ -155,6 +155,21 @@ describe 'MaboStringParser' do
               [{"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"a"}]},
                {"t"=>"sqs", "s"=>"'a small single quoted string}\"'"}]}]}],
 
+      "\n{\n  a = 1;\n  b = 2;\n}\nHello World! {@ table}" =>
+        [{"t"=>"sqs", "s"=>"\n"},
+         {"t"=>"exps",
+          "a"=>
+           [{"t"=>"exp",
+             "a"=>
+              [{"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"a"}]},
+               {"t"=>"num", "n"=>1}]},
+            {"t"=>"exp",
+             "a"=>
+              [{"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"b"}]},
+               {"t"=>"num", "n"=>2}]}]},
+         {"t"=>"sqs", "s"=>"\n" + "Hello World! "},
+         {"t"=>"exps", "a"=>[{"t"=>"table", "s"=>"table"}]}],
+
     }.each do |k, v|
 
       it "parses #{k.inspect}" do
