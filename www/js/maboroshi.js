@@ -20,7 +20,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function pbstart(i) { return rex(null, i, /\{[;\s]*/); }
   function pbend(i)   { return rex(null, i, /[;\s]*\}/); }
 
-  function parstart(i) { return rex(null, i, /\(\s*/); }
+  function parstart(i) { return rex(null, i, /\s*\(\s*/); }
   function parend(i)   { return rex(null, i, /\)\s*/); }
 
   function nil(i) { return rex('nil', i, /nil|null/i); }

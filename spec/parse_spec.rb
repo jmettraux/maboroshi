@@ -181,6 +181,8 @@ describe 'MaboStringParser' do
          {"t"=>"sqs", "s"=>"\n" + "Hello World! "},
          {"t"=>"exps", "a"=>[{"t"=>"table", "s"=>"table"}]}],
 
+      #"{fun(1, '2', b)}" =>
+
     }.each do |k, v|
 
       it "parses #{k.inspect}" do
