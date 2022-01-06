@@ -44,32 +44,32 @@ describe 'MaboTableSet' do
         "entries" => [ "human", "dwarf", "elf", "halflin" ] })
     end
 
-    it 'parses a table with a <script> section' do
-
-      s = %{
-# some table
-
-<script>
-a = 1;
-b = 2;
-</script>
-Nada
-      }.strip
-
-      t = evaluate(
-        "return MaboTableSet.doMake('x.md', #{s.inspect});")
-
-      expect(t).to eq(
-        {"main"=>"some table",
-         "tables"=>
-          {"some table"=>
-            {"type"=>"string",
-             "string"=>
-              "\n" + "<script>\n" + "a = 1;\n" + "b = 2;\n" + "</script>\n" +
-              "Nada"}},
-         "vars"=>{},
-         "parent"=>nil})
-    end
+#    it 'parses a table with a <script> section' do
+#
+#      s = %{
+## some table
+#
+#<script>
+#a = 1;
+#b = 2;
+#</script>
+#Nada
+#      }.strip
+#
+#      t = evaluate(
+#        "return MaboTableSet.doMake('x.md', #{s.inspect});")
+#
+#      expect(t).to eq(
+#        {"main"=>"some table",
+#         "tables"=>
+#          {"some table"=>
+#            {"type"=>"string",
+#             "string"=>
+#              "\n" + "<script>\n" + "a = 1;\n" + "b = 2;\n" + "</script>\n" +
+#              "Nada"}},
+#         "vars"=>{},
+#         "parent"=>nil})
+#    end
   end
 end
 
