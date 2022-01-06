@@ -23,6 +23,11 @@ describe 'MaboTableSet' do
       '{12 + 34}' =>
         46,
 
+      '{4d6kh3}' => [ 3, 18 ],
+      '{4d6kl3}' => [ 3, 18 ],
+      '{4d6kh}' => [ 1, 6 ],
+      '{4d6kl}' => [ 1, 6 ],
+
       '{a = 11}' => { r: 11, h: { vars: { 'a' => 11 } } },
       '{a = B = 12}' => { r: 12, h: { vars: { 'a' => 12, 'B' => 12 } } },
       '{a1 = B2 = 13}' => { r: 13, h: { vars: { 'a1' => 13, 'B2' => 13 } } },
@@ -44,14 +49,14 @@ describe 'MaboTableSet' do
 
         if v.is_a?(Array) && v.length == 2 # dice range
 
-          (v[1] * 3).times do
+          210.times do
             r, h = evaluate("return MaboTableSet.debugEval(#{k.inspect})");
             expect(r).to be_between(*v)
           end
 
         elsif v.is_a?(Array)
 
-          (v.length * 3).times do
+          210.times do
             r, h = evaluate("return MaboTableSet.debugEval(#{k.inspect})");
             expect(v.include?(r)).to eq(true)
           end

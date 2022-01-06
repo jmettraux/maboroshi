@@ -185,13 +185,15 @@ var MaboTableSet = (function() {
 
   evals.dice = function(set, n) {
     if (n.ds) {
-      r = '';
+      var r = '';
       n.ds.forEach(function(d) { r = r + random(d); });
       return parseInt(r, 10);
     }
-    var r = 0;
-    for (var i = 0; i < n.c; i++) { r = r + random(n.d); }
-    return r; };
+    var rs = [];
+    for (var i = 0; i < n.c; i++) { rs.push(random(n.d)); }
+    if (n.kh) rs = rs.sort().reverse().slice(0, n.kh);
+    else if (n.kl) rs = rs.sort().slice(0, n.kl);
+    return rs.reduce(function(a, b) { return a + b; }, 0); };
 
   evals.num = function(set, n) {
     return n.n; }
