@@ -44,13 +44,21 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function tname(i) { return rex('tname', i, /[^;}]+/); } // FIXME
   function table(i) { return seq('table', i, atsig, tname); }
 
-  function comexps(i) { return jseq('comexps', i, exp, comma); }
+  function comexps(i)  { return jseq('comexps', i, exp, comma); }
 
-  function caidx(i) { return seq('caidx', i, castart, comexps, caend); }
-  function sqidx(i) { return seq('sqidx', i, sqstart, comexps, sqend); }
+  function coexps(i)   { return jseq(null, i, exp, colon); }
+  function scoexps(i)  { return jseq(null, i, exp, semco); }
+
+  function colexps(i)  { return seq('colexps', i, exp, colon, coexps); }
+  function scolexps(i) { return seq('scolexps', i, exp, semco, scoexps); }
+
+  function sqexps(i) { return alt(null, i, scolexps, colexps,       comexps); }
 
   function num_or_iden(i) { return alt(null, i, num, iden); }
+
   function doidx(i) { return seq('doidx', i, dot, num_or_iden); }
+  function caidx(i) { return seq('caidx', i, castart, comexps, caend); }
+  function sqidx(i) { return seq('sqidx', i, sqstart, sqexps, sqend); }
 
   function index(i) { return alt(null, i, sqidx, caidx, doidx); }
 
@@ -115,11 +123,10 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
   var rewrite_string = _rewrite_sub;
 
-  function rewrite_comexps(t) {
-    return { t: 'comexps', a: t.subgather().map(rewrite) }; }
-
-  function rewrite_exps(t) {
-    return { t: 'exps', a: t.subgather().map(rewrite) }; }
+  var rewrite_comexps = _rewrite_nsub;
+  var rewrite_colexps = _rewrite_nsub;
+  var rewrite_scolexps = _rewrite_nsub;
+  var rewrite_exps = _rewrite_nsub;
 
   function rewrite_exp(t) {
 

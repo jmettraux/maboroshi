@@ -13,6 +13,9 @@ require 'ferrum'
 
 module Helpers
 
+  #MW = IO.console.winsize[1] rescue 80
+  MW = 1000 # :-(
+
   def evaluate(s)
 
     $sources ||=
@@ -60,8 +63,6 @@ module Helpers
     res = n['result']
     r = res.to_s; r = "#{c1}#{r}#{tc}" if res == 1
 
-    mw = IO.console.winsize[1] rescue 80
-
     na = n['name']; na = na ? "#{nc}#{na}#{tc}" : '(null)'
 
     ind = (0..indent)
@@ -82,7 +83,7 @@ module Helpers
       sc1 = "[0;90m"
     end
 
-    mw = mw - sio.length - 3 - 10; mw = 0 if mw < 0
+    mw = MW - sio.length - 3 - 10; mw = 0 if mw < 0
     s = s[0, mw]
     if l < mw
       s.insert(l, sc1)
