@@ -24,6 +24,9 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function boo(i) { return rex('boo', i, /true|false/i); }
   function num(i) { return rex('num', i, /-?\d+/); }
 
+  function ppbstart(i) { return rex(null, i, /\{\s*/); }
+  function ppbend(i)   { return rex(null, i, /\s*\}\s*/); }
+
   function pbstart(i) { return rex(null, i, /\{[;\s]*/); }
   function pbend(i)   { return rex(null, i, /[;\s]*\}/); }
 
@@ -68,7 +71,11 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function cdice(i) { return rex('cdice', i, /\d+[dD]\d+(k[hl]\d*)?/); }
   function dice(i) { return alt('dice', i, cdice, ddice); }
 
-  function dict(i) { return str('dict', i, 'FIXME'); }
+  function dentry(i) { return seq('dentry', i, iden, colon, exp); }
+  function dentry_qmark(i) { return rep(null, i, dentry, 0, 1); }
+
+  function dict(i) { return eseq('dict', i, ppbstart, dentry_qmark, comma, ppbend); }
+
   function list(i) { return seq('list', i, sqstart, comexps, '?', sqend); }
 
   function par(i) { return seq('par', i, parstart, scoexps, parend); }
@@ -179,6 +186,9 @@ var MaboStringParser = Jaabro.makeParser(function() {
     var ces = t.sublookup('comexps');
     return { t: 'list', a: ces ? rewrite(ces).a : [] } }
 
+  var rewrite_dentry = _rewrite_sub;
+  var rewrite_dict = _rewrite_nsub;
+
 }); // end MaboStringParser
 
 
@@ -198,6 +208,13 @@ var MaboTableSet = (function() {
     return 1 + Math.floor(Math.random() * (max - 1)); };
 
   var evals = {};
+
+  evals.dict = function(set, n) {
+    return n.a.reduce(
+      function(r, kv) {
+        r[evalNode(set, kv[0])] = evalNode(set, kv[1]);
+        return r; },
+      {}); };
 
   evals.list = function(set, n) {
     return n.a.map(function(nn) { return evalNode(set, nn); }); };

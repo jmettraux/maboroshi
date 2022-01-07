@@ -82,6 +82,10 @@ describe 'MaboTableSet' do
 
         "{ [ 1, 'deux', true ] }" => [ 1, 'deux', true ],
 
+        "{ {} }" => {},
+        "{ {,} }" => {},
+        "{ { ab: 1, cd: 2, } }" => { 'ab' => 1, 'cd' => 2 },
+
       }.each do |k, v|
 
         it "evals #{k.inspect}" do
