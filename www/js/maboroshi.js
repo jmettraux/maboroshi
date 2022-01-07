@@ -194,6 +194,7 @@ var MaboTableSet = (function() {
     var r = null;
     n.a.forEach(function(nn) { r = evalNode(set, nn); });
     return r; };
+  evals.par = evals.exps;
 
   evals.sqs = function(set, n) {
     return n.s.slice(1, -1); };

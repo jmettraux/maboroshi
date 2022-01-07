@@ -45,6 +45,8 @@ describe 'MaboTableSet' do
 
       "{a}" => nil,
 
+      "{a = (1; 2; 3)}" => 3,
+
     }.each do |k, v|
 
       it "evals #{k.inspect}" do
