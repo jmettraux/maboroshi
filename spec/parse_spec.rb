@@ -310,10 +310,15 @@ describe 'MaboStringParser' do
       "{ [ 1, 'deux' ] }" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"list",
-             "a"=>
-              [{"t"=>"comexps",
-                "a"=>[{"t"=>"num", "n"=>1}, {"t"=>"sqs", "s"=>"'deux'"}]}]}]}],
+           [{"t"=>"list", "a"=>[
+             {"t"=>"num", "n"=>1},
+             {"t"=>"sqs", "s"=>"'deux'"}]}]}],
+
+      "{ true }" =>
+        [{"t"=>"exps", "a"=>[{"t"=>"boo", "b"=>true}]}],
+
+      "{ [] }" =>
+        [{"t"=>"exps", "a"=>[{"t"=>"list", "a"=>[]}]}],
 
       "{ a = [ 1, 'deux', 1 + 2, true ] }" =>
         [{"t"=>"exps",
@@ -323,17 +328,16 @@ describe 'MaboStringParser' do
               [{"t"=>"heass", "a"=>[{"t"=>"iden", "s"=>"a"}]},
                {"t"=>"list",
                 "a"=>
-                 [{"t"=>"comexps",
+                 [{"t"=>"num", "n"=>1},
+                  {"t"=>"sqs", "s"=>"'deux'"},
+                  {"t"=>"exp",
                    "a"=>
                     [{"t"=>"num", "n"=>1},
-                     {"t"=>"sqs", "s"=>"'deux'"},
-                     {"t"=>"exp",
-                      "a"=>
-                       [{"t"=>"num", "n"=>1},
-                        {"t"=>"sop", "s"=>"+"},
-                        {"t"=>"num", "n"=>2}]},
-                     {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"true"}]}]}]}]}]}],
+                     {"t"=>"sop", "s"=>"+"},
+                     {"t"=>"num", "n"=>2}]},
+                  {"t"=>"boo", "b"=>true}]}]}]}],
 
+      #"{ {} }" => 0,
       #"{ d = { name: 'joe', hp: 10, ac: 15, atk: 3 }" => 0,
 
     }.each do |k, v|

@@ -52,7 +52,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function colexps(i)  { return seq('colexps', i, exp, colon, coexps); }
   function scolexps(i) { return seq('scolexps', i, exp, semco, scoexps); }
 
-  function sqexps(i) { return alt(null, i, scolexps, colexps,       comexps); }
+  function sqexps(i) { return alt(null, i, scolexps, colexps, comexps); }
 
   function num_or_iden(i) { return alt(null, i, num, iden); }
 
@@ -69,13 +69,13 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function dice(i) { return alt('dice', i, cdice, ddice); }
 
   function dict(i) { return str('dict', i, 'FIXME'); }
-  function list(i) { return seq('list', i, sqstart, comexps, sqend); }
+  function list(i) { return seq('list', i, sqstart, comexps, '?', sqend); }
 
   function par(i) { return seq('par', i, parstart, scoexps, parend); }
 
   function val(i) {
     return alt(null, i,
-      par, list, dict, dice, vcall, table, sqstring, dqstring, num, boo, nil); }
+      par, list, dict, dice, num, boo, nil, vcall, table, sqstring, dqstring); }
 
   function semod(i) { return rex('sop', i, /\s*%\s*/); }
   function seprd(i) { return rex('sop', i, /\s*[\*\/]\s*/); }
@@ -147,6 +147,8 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
   function rewrite_num(t) {
     return { t: 'num', n: parseInt(t.string(), 10) }; }
+  function rewrite_boo(t) {
+    return { t: 'boo', b: t.string().toLowerCase() === 'true' }; }
 
   var rewrite_sqs = _rewrite_s;
   var rewrite_sop = _rewrite_st;
@@ -173,8 +175,9 @@ var MaboStringParser = Jaabro.makeParser(function() {
   var rewrite_caidx = _rewrite_nsub;
   var rewrite_vcall = _rewrite_nsub;
 
-  var rewrite_dict = _rewrite_nsub;
-  var rewrite_list = _rewrite_nsub;
+  function rewrite_list(t) {
+    var ces = t.sublookup('comexps');
+    return { t: 'list', a: ces ? rewrite(ces).a : [] } }
 
 }); // end MaboStringParser
 
@@ -195,6 +198,9 @@ var MaboTableSet = (function() {
     return 1 + Math.floor(Math.random() * (max - 1)); };
 
   var evals = {};
+
+  evals.list = function(set, n) {
+    return n.a.map(function(nn) { return evalNode(set, nn); }); };
 
   evals.exps = function(set, n) {
     var r = null;
@@ -253,7 +259,9 @@ var MaboTableSet = (function() {
     return rs.reduce(function(a, b) { return a + b; }, 0); };
 
   evals.num = function(set, n) {
-    return n.n; }
+    return n.n; };
+  evals.boo = function(set, n) {
+    return n.b; };
 
   evals.prd = function(set, n) {
     var mod = 1;
