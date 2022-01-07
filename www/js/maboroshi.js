@@ -74,9 +74,13 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function dentry(i) { return seq('dentry', i, iden, colon, exp); }
   function dentry_qmark(i) { return rep(null, i, dentry, 0, 1); }
 
-  function dict(i) { return eseq('dict', i, ppbstart, dentry_qmark, comma, ppbend); }
+  function dict(i) {
+    return eseq('dict', i,
+      ppbstart, dentry_qmark, comma, ppbend); }
 
-  function list(i) { return seq('list', i, sqstart, comexps, '?', sqend); }
+  function exp_qmark(i) { return rep(null, i, exp, 0, 1); }
+
+  function list(i) { return eseq('list', i, sqstart, exp_qmark, comma, sqend); }
 
   function par(i) { return seq('par', i, parstart, scoexps, parend); }
 
@@ -182,9 +186,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
   var rewrite_caidx = _rewrite_nsub;
   var rewrite_vcall = _rewrite_nsub;
 
-  function rewrite_list(t) {
-    var ces = t.sublookup('comexps');
-    return { t: 'list', a: ces ? rewrite(ces).a : [] } }
+  var rewrite_list = _rewrite_nsub;
 
   var rewrite_dentry = _rewrite_sub;
   var rewrite_dict = _rewrite_nsub;
