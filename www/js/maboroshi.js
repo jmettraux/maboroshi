@@ -68,8 +68,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function cdice(i) { return rex('cdice', i, /\d+[dD]\d+(k[hl]\d*)?/); }
   function dice(i) { return alt('dice', i, cdice, ddice); }
 
-  //function par(i) { return seq('par', i, parstart, exps, parend); }
-  function par(i) { return str('par', i, '()'); } // FIXME
+  function par(i) { return seq('par', i, parstart, scoexps, parend); }
 
   function val(i) {
     return alt(null, i,
@@ -127,6 +126,8 @@ var MaboStringParser = Jaabro.makeParser(function() {
   var rewrite_colexps = _rewrite_nsub;
   var rewrite_scolexps = _rewrite_nsub;
   var rewrite_exps = _rewrite_nsub;
+
+  var rewrite_par = _rewrite_nsub;
 
   function rewrite_exp(t) {
 
