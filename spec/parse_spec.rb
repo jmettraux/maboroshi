@@ -307,7 +307,33 @@ describe 'MaboStringParser' do
                   {"t"=>"num", "n"=>2},
                   {"t"=>"num", "n"=>3}]}]}]}],
 
-      #"{ a = [ 1, 'deux', 3, true ] }" => 0,
+      "{ [ 1, 'deux' ] }" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"list",
+             "a"=>
+              [{"t"=>"comexps",
+                "a"=>[{"t"=>"num", "n"=>1}, {"t"=>"sqs", "s"=>"'deux'"}]}]}]}],
+
+      "{ a = [ 1, 'deux', 1 + 2, true ] }" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"exp",
+             "a"=>
+              [{"t"=>"heass", "a"=>[{"t"=>"iden", "s"=>"a"}]},
+               {"t"=>"list",
+                "a"=>
+                 [{"t"=>"comexps",
+                   "a"=>
+                    [{"t"=>"num", "n"=>1},
+                     {"t"=>"sqs", "s"=>"'deux'"},
+                     {"t"=>"exp",
+                      "a"=>
+                       [{"t"=>"num", "n"=>1},
+                        {"t"=>"sop", "s"=>"+"},
+                        {"t"=>"num", "n"=>2}]},
+                     {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"true"}]}]}]}]}]}],
+
       #"{ d = { name: 'joe', hp: 10, ac: 15, atk: 3 }" => 0,
 
     }.each do |k, v|

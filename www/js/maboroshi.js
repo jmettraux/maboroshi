@@ -34,7 +34,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
   var caend = parend; // for now...
 
   function sqstart(i) { return rex(null, i, /\[\s*/); }
-  function sqend(i)   { return rex(null, i, /\]\s*/); }
+  function sqend(i)   { return rex(null, i, /\s*\]\s*/); }
 
   function iden(i) { return rex('iden', i, /[a-zA-Z][a-zA-Z0-9_]*/); }
 
@@ -68,11 +68,14 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function cdice(i) { return rex('cdice', i, /\d+[dD]\d+(k[hl]\d*)?/); }
   function dice(i) { return alt('dice', i, cdice, ddice); }
 
+  function dict(i) { return str('dict', i, 'FIXME'); }
+  function list(i) { return seq('list', i, sqstart, comexps, sqend); }
+
   function par(i) { return seq('par', i, parstart, scoexps, parend); }
 
   function val(i) {
     return alt(null, i,
-      par, dice, vcall, table, sqstring, dqstring, num, boo, nil); }
+      par, list, dict, dice, vcall, table, sqstring, dqstring, num, boo, nil); }
 
   function semod(i) { return rex('sop', i, /\s*%\s*/); }
   function seprd(i) { return rex('sop', i, /\s*[\*\/]\s*/); }
@@ -169,6 +172,9 @@ var MaboStringParser = Jaabro.makeParser(function() {
   var rewrite_sqidx = _rewrite_nsub;
   var rewrite_caidx = _rewrite_nsub;
   var rewrite_vcall = _rewrite_nsub;
+
+  var rewrite_dict = _rewrite_nsub;
+  var rewrite_list = _rewrite_nsub;
 
 }); // end MaboStringParser
 
