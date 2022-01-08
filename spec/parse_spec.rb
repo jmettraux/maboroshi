@@ -38,19 +38,21 @@ describe 'MaboStringParser' do
           {"t"=>"dice", 'c' => 1, 'd' => 6 } ] },
         {"t"=>"sqs", "s"=>" orc"}],
 
-      "{a = 1}" => [
-        {"t"=>"exps", "a"=> [
-          {"t"=>"exp", "a"=> [
-            {"t"=>"heass", "a"=>[{"t"=>"iden", "s"=>"a"}]},
-            {"t"=>"num", "n"=>1}]}]}],
+      "{a = 1}" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"exp",
+             "a"=>
+              [{"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"a"}]},
+               {"t"=>"num", "n"=>1}]}]}],
 
       "{a = b = 2}" =>
         [{"t"=>"exps",
           "a"=>
            [{"t"=>"exp",
              "a"=>
-              [{"t"=>"heass", "a"=>[{"t"=>"iden", "s"=>"a"}]},
-               {"t"=>"heass", "a"=>[{"t"=>"iden", "s"=>"b"}]},
+              [{"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"a"}]},
+               {"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"b"}]},
                {"t"=>"num", "n"=>2}]}]}],
 
       "{a ? b : c}" =>
@@ -58,69 +60,61 @@ describe 'MaboStringParser' do
           "a"=>
            [{"t"=>"exp",
              "a"=>
-              [{"t"=>"heter",
-                "a"=>
-                 [{"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"a"}]},
-                  {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"b"}]}]},
-               {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"c"}]}]}]}],
+              [{"t"=>"heter", "a"=>[
+                {"t"=>"vname", "s"=>"a"}, {"t"=>"vname", "s"=>"b"}]},
+               {"t"=>"vname", "s"=>"c"}]}]}],
 
       "{a ? b : c ? d : e}" =>
         [{"t"=>"exps",
           "a"=>
            [{"t"=>"exp",
              "a"=>
-              [{"t"=>"heter",
-                "a"=>
-                 [{"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"a"}]},
-                  {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"b"}]}]},
-               {"t"=>"heter",
-                "a"=>
-                 [{"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"c"}]},
-                  {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"d"}]}]},
-               {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"e"}]}]}]}],
+              [{"t"=>"heter", "a"=>[
+                {"t"=>"vname", "s"=>"a"}, {"t"=>"vname", "s"=>"b"}]},
+               {"t"=>"heter", "a"=>[
+                {"t"=>"vname", "s"=>"c"}, {"t"=>"vname", "s"=>"d"}]},
+               {"t"=>"vname", "s"=>"e"}]}]}],
 
       "{x = a ? b : c}" =>
         [{"t"=>"exps",
           "a"=>
            [{"t"=>"exp",
              "a"=>
-              [{"t"=>"heass", "a"=>[{"t"=>"iden", "s"=>"x"}]},
+              [{"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"x"}]},
                {"t"=>"exp",
                 "a"=>
                  [{"t"=>"heter",
-                   "a"=>
-                    [{"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"a"}]},
-                     {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"b"}]}]},
-                  {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"c"}]}]}]}]}],
+                   "a"=>[{"t"=>"vname", "s"=>"a"}, {"t"=>"vname", "s"=>"b"}]},
+                  {"t"=>"vname", "s"=>"c"}]}]}]}],
 
       "{a || b}" =>
         [{"t"=>"exps",
           "a"=>
            [{"t"=>"exp",
              "a"=>
-              [{"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"a"}]},
+              [{"t"=>"vname", "s"=>"a"},
                {"t"=>"sop", "s"=>"||"},
-               {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"b"}]}]}]}],
+               {"t"=>"vname", "s"=>"b"}]}]}],
 
       "{a == b}" =>
         [{"t"=>"exps",
           "a"=>
            [{"t"=>"exp",
              "a"=>
-              [{"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"a"}]},
+              [{"t"=>"vname", "s"=>"a"},
                {"t"=>"sop", "s"=>"=="},
-               {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"b"}]}]}]}],
+               {"t"=>"vname", "s"=>"b"}]}]}],
 
       "{a >= b < c}" =>
         [{"t"=>"exps",
           "a"=>
            [{"t"=>"exp",
              "a"=>
-              [{"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"a"}]},
+              [{"t"=>"vname", "s"=>"a"},
                {"t"=>"sop", "s"=>">="},
-               {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"b"}]},
+               {"t"=>"vname", "s"=>"b"},
                {"t"=>"sop", "s"=>"<"},
-               {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"c"}]}]}]}],
+               {"t"=>"vname", "s"=>"c"}]}]}],
 
       "{10 + 1d6 - 2 * 3}" =>
         [{"t"=>"exps",
@@ -168,7 +162,7 @@ describe 'MaboStringParser' do
           "a"=>
            [{"t"=>"exp",
              "a"=>
-              [{"t"=>"heass", "a"=>[{"t"=>"iden", "s"=>"a"}]},
+              [{"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"a"}]},
                {"t"=>"table", "s"=>"table"}]}]}],
 
       "{a = 'a small single quoted string}\"'}" =>
@@ -176,7 +170,7 @@ describe 'MaboStringParser' do
           "a"=>
            [{"t"=>"exp",
              "a"=>
-              [{"t"=>"heass", "a"=>[{"t"=>"iden", "s"=>"a"}]},
+              [{"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"a"}]},
                {"t"=>"sqs", "s"=>"'a small single quoted string}\"'"}]}]}],
 
       "\n{\n  a = 1;\n  b = 2;\n}\nHello World! {@ table}" =>
@@ -185,11 +179,11 @@ describe 'MaboStringParser' do
           "a"=>
            [{"t"=>"exp",
              "a"=>
-              [{"t"=>"heass", "a"=>[{"t"=>"iden", "s"=>"a"}]},
+              [{"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"a"}]},
                {"t"=>"num", "n"=>1}]},
             {"t"=>"exp",
              "a"=>
-              [{"t"=>"heass", "a"=>[{"t"=>"iden", "s"=>"b"}]},
+              [{"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"b"}]},
                {"t"=>"num", "n"=>2}]}]},
          {"t"=>"sqs", "s"=>"\n" + "Hello World! "},
          {"t"=>"exps", "a"=>[{"t"=>"table", "s"=>"table"}]}],
@@ -197,76 +191,76 @@ describe 'MaboStringParser' do
       "{fun(1, '2', b)}" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"vcall",
+           [{"t"=>"ocall",
              "a"=>
-              [{"t"=>"iden", "s"=>"fun"},
+              [{"t"=>"vname", "s"=>"fun"},
                {"t"=>"comexps",
                 "a"=>
                  [{"t"=>"num", "n"=>1},
                   {"t"=>"sqs", "s"=>"'2'"},
-                  {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"b"}]}]}]}]}],
+                  {"t"=>"vname", "s"=>"b"}]}]}]}],
 
       "{a[1]}" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"vcall",
+           [{"t"=>"ocall",
              "a"=>
-              [{"t"=>"iden", "s"=>"a"},
+              [{"t"=>"vname", "s"=>"a"},
                {"t"=>"comexps", "a"=>[{"t"=>"num", "n"=>1}]}]}]}],
 
       "{a[1:]}" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"vcall",
+           [{"t"=>"ocall",
              "a"=>
-              [{"t"=>"iden", "s"=>"a"},
+              [{"t"=>"vname", "s"=>"a"},
                {"t"=>"colexps", "a"=>[{"t"=>"num", "n"=>1}]}]}]}],
 
       "{a[:2]}" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"vcall",
+           [{"t"=>"ocall",
              "a"=>
-              [{"t"=>"iden", "s"=>"a"},
+              [{"t"=>"vname", "s"=>"a"},
                {"t"=>"colexps", "a"=>[{"t"=>"num", "n"=>2}]}]}]}],
 
       "{a[1:2]}" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"vcall",
+           [{"t"=>"ocall",
              "a"=>
-              [{"t"=>"iden", "s"=>"a"},
+              [{"t"=>"vname", "s"=>"a"},
                {"t"=>"colexps", "a"=>[
                  {"t"=>"num", "n"=>1}, {"t"=>"num", "n"=>2}]}]}]}],
 
       "{a[1;]}" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"vcall",
+           [{"t"=>"ocall",
              "a"=>
-              [{"t"=>"iden", "s"=>"a"},
+              [{"t"=>"vname", "s"=>"a"},
                {"t"=>"scolexps", "a"=>[{"t"=>"num", "n"=>1}]}]}]}],
 
       "{a[;1]}" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"vcall",
+           [{"t"=>"ocall",
              "a"=>
-              [{"t"=>"iden", "s"=>"a"},
+              [{"t"=>"vname", "s"=>"a"},
                {"t"=>"scolexps", "a"=>[{"t"=>"num", "n"=>1}]}]}]}],
 
       "{a[;]}" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"vcall",
-             "a"=>[{"t"=>"iden", "s"=>"a"}, {"t"=>"scolexps", "a"=>[]}]}]}],
+           [{"t"=>"ocall",
+             "a"=>[{"t"=>"vname", "s"=>"a"}, {"t"=>"scolexps", "a"=>[]}]}]}],
 
       "{a[1;2;3]}" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"vcall",
+           [{"t"=>"ocall",
              "a"=>
-              [{"t"=>"iden", "s"=>"a"},
+              [{"t"=>"vname", "s"=>"a"},
                {"t"=>"scolexps",
                 "a"=>
                  [{"t"=>"num", "n"=>1},
@@ -276,28 +270,28 @@ describe 'MaboStringParser' do
       "{a[1, 2]}" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"vcall",
+           [{"t"=>"ocall",
              "a"=>
-              [{"t"=>"iden", "s"=>"a"},
+              [{"t"=>"vname", "s"=>"a"},
                {"t"=>"comexps", "a"=>[
                  {"t"=>"num", "n"=>1}, {"t"=>"num", "n"=>2}]}]}]}],
 
       "{a.b}" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"vcall", "a"=>[
-             {"t"=>"iden", "s"=>"a"}, {"t"=>"iden", "s"=>"b"}]}]}],
+           [{"t"=>"ocall", "a"=>[
+             {"t"=>"vname", "s"=>"a"}, {"t"=>"vname", "s"=>"b"}]}]}],
 
       "{a.0}" =>
         [{"t"=>"exps",
-          "a"=>[{"t"=>"vcall", "a"=>[
-            {"t"=>"iden", "s"=>"a"}, {"t"=>"num", "n"=>0}]}]}],
+          "a"=>[{"t"=>"ocall", "a"=>[
+            {"t"=>"vname", "s"=>"a"}, {"t"=>"num", "n"=>0}]}]}],
 
       "{a.-1}" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"vcall", "a"=>[
-             {"t"=>"iden", "s"=>"a"}, {"t"=>"num", "n"=>-1}]}]}],
+           [{"t"=>"ocall", "a"=>[
+             {"t"=>"vname", "s"=>"a"}, {"t"=>"num", "n"=>-1}]}]}],
 
       "{-1}" =>
         [{"t"=>"exps", "a"=>[{"t"=>"num", "n"=>-1}]}],
@@ -337,7 +331,7 @@ describe 'MaboStringParser' do
           "a"=>
            [{"t"=>"exp",
              "a"=>
-              [{"t"=>"heass", "a"=>[{"t"=>"iden", "s"=>"a"}]},
+              [{"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"a"}]},
                {"t"=>"par",
                 "a"=>
                  [{"t"=>"num", "n"=>1},
@@ -366,7 +360,7 @@ describe 'MaboStringParser' do
           "a"=>
            [{"t"=>"exp",
              "a"=>
-              [{"t"=>"heass", "a"=>[{"t"=>"iden", "s"=>"a"}]},
+              [{"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"a"}]},
                {"t"=>"list",
                 "a"=>
                  [{"t"=>"num", "n"=>1},
@@ -383,8 +377,8 @@ describe 'MaboStringParser' do
           "a"=>
            [{"t"=>"dict",
              "a"=>
-              [[{"t"=>"iden", "s"=>"ab"}, {"t"=>"num", "n"=>1}],
-               [{"t"=>"iden", "s"=>"cd"}, {"t"=>"num", "n"=>2}]]}]}],
+              [[{"t"=>"vname", "s"=>"ab"}, {"t"=>"num", "n"=>1}],
+               [{"t"=>"vname", "s"=>"cd"}, {"t"=>"num", "n"=>2}]]}]}],
 
       "{ {} }" =>
         [{"t"=>"exps", "a"=>[{"t"=>"dict", "a"=>[]}]}],
@@ -396,13 +390,13 @@ describe 'MaboStringParser' do
           "a"=>
            [{"t"=>"exp",
              "a"=>
-              [{"t"=>"heass", "a"=>[{"t"=>"iden", "s"=>"d"}]},
+              [{"t"=>"heass", "a"=>[{"t"=>"vname", "s"=>"d"}]},
                {"t"=>"dict",
                 "a"=>
-                 [[{"t"=>"iden", "s"=>"name"}, {"t"=>"sqs", "s"=>"'joe'"}],
-                  [{"t"=>"iden", "s"=>"hp"}, {"t"=>"num", "n"=>10}],
-                  [{"t"=>"iden", "s"=>"ac"}, {"t"=>"num", "n"=>15}],
-                  [{"t"=>"iden", "s"=>"atk"}, {"t"=>"num", "n"=>3}]]}]}]}],
+                 [[{"t"=>"vname", "s"=>"name"}, {"t"=>"sqs", "s"=>"'joe'"}],
+                  [{"t"=>"vname", "s"=>"hp"}, {"t"=>"num", "n"=>10}],
+                  [{"t"=>"vname", "s"=>"ac"}, {"t"=>"num", "n"=>15}],
+                  [{"t"=>"vname", "s"=>"atk"}, {"t"=>"num", "n"=>3}]]}]}]}],
 
       "{ 1 * (2 + 3) }" =>
         [{"t"=>"exps",
