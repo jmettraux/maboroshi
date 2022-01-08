@@ -59,9 +59,9 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
   function num_or_iden(i) { return alt(null, i, num, iden); }
 
-  function doidx(i) { return seq('doidx', i, dot, num_or_iden); }
-  function caidx(i) { return seq('caidx', i, castart, comexps, caend); }
-  function sqidx(i) { return seq('sqidx', i, sqstart, sqexps, sqend); }
+  function doidx(i) { return seq(null, i, dot, num_or_iden); }
+  function caidx(i) { return seq(null, i, castart, comexps, caend); }
+  function sqidx(i) { return seq(null, i, sqstart, sqexps, sqend); }
 
   function index(i) { return alt(null, i, sqidx, caidx, doidx); }
 
@@ -181,9 +181,6 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
   function rewrite_dice(t) { return rewrite(t.children[0]); }
 
-  var rewrite_doidx = _rewrite_nsub;
-  var rewrite_sqidx = _rewrite_nsub;
-  var rewrite_caidx = _rewrite_nsub;
   var rewrite_vcall = _rewrite_nsub;
 
   var rewrite_list = _rewrite_nsub;
@@ -221,6 +218,13 @@ var MaboTableSet = (function() {
   evals.list = function(set, n) {
     return n.a.map(function(nn) { return evalNode(set, nn); }); };
 
+  evals._exps = function(set, n) {
+    return {
+      t: n.t,
+      a: n.a.map(function(nn) { return evalNode(set, nn); }) }; };
+
+  evals.comexps = evals._exps;
+
   evals.exps = function(set, n) {
     var r = null;
     n.a.forEach(function(nn) { r = evalNode(set, nn); });
@@ -248,12 +252,23 @@ var MaboTableSet = (function() {
     }
   };
 
+  var aviComexps = function(value, index) {
+    return value[index.a[0]];
+  };
+  var isComexps = function(o) {
+    if (typeof o !== 'object') return false;
+    if (o.t !== 'comexps') return false;
+    return true;
+  };
+  var applyVcallIndex = function(value, index) {
+    if (isComexps(index)) return aviComexps(value, index);
+    return value;
+  };
+
   evals.vcall = function(set, n) {
     var is = n.a.map(function(nn) { return evalNode(set, nn); });
     var v = evals._lookup(set, is[0][0]); // FIXME first.first ???
-    for (var i = 1, l = is.length; i < l; i++) {
-// TODO
-    }
+    for (var i = 1, l = is.length; i < l; i++) v = applyVcallIndex(v, is[i]);
     return v;
   };
 

@@ -200,13 +200,11 @@ describe 'MaboStringParser' do
            [{"t"=>"vcall",
              "a"=>
               [{"t"=>"iden", "s"=>"fun"},
-               {"t"=>"caidx",
+               {"t"=>"comexps",
                 "a"=>
-                 [{"t"=>"comexps",
-                   "a"=>
-                    [{"t"=>"num", "n"=>1},
-                     {"t"=>"sqs", "s"=>"'2'"},
-                     {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"b"}]}]}]}]}]}],
+                 [{"t"=>"num", "n"=>1},
+                  {"t"=>"sqs", "s"=>"'2'"},
+                  {"t"=>"vcall", "a"=>[{"t"=>"iden", "s"=>"b"}]}]}]}]}],
 
       "{a[1]}" =>
         [{"t"=>"exps",
@@ -214,8 +212,7 @@ describe 'MaboStringParser' do
            [{"t"=>"vcall",
              "a"=>
               [{"t"=>"iden", "s"=>"a"},
-               {"t"=>"sqidx",
-                "a"=>[{"t"=>"comexps", "a"=>[{"t"=>"num", "n"=>1}]}]}]}]}],
+               {"t"=>"comexps", "a"=>[{"t"=>"num", "n"=>1}]}]}]}],
 
       "{a[1:2]}" =>
         [{"t"=>"exps",
@@ -223,10 +220,8 @@ describe 'MaboStringParser' do
            [{"t"=>"vcall",
              "a"=>
               [{"t"=>"iden", "s"=>"a"},
-               {"t"=>"sqidx",
-                "a"=>
-                 [{"t"=>"colexps",
-                   "a"=>[{"t"=>"num", "n"=>1}, {"t"=>"num", "n"=>2}]}]}]}]}],
+               {"t"=>"colexps", "a"=>[
+                 {"t"=>"num", "n"=>1}, {"t"=>"num", "n"=>2}]}]}]}],
 
       "{a[1;2;3]}" =>
         [{"t"=>"exps",
@@ -234,13 +229,11 @@ describe 'MaboStringParser' do
            [{"t"=>"vcall",
              "a"=>
               [{"t"=>"iden", "s"=>"a"},
-               {"t"=>"sqidx",
+               {"t"=>"scolexps",
                 "a"=>
-                 [{"t"=>"scolexps",
-                   "a"=>
-                    [{"t"=>"num", "n"=>1},
-                     {"t"=>"num", "n"=>2},
-                     {"t"=>"num", "n"=>3}]}]}]}]}],
+                 [{"t"=>"num", "n"=>1},
+                  {"t"=>"num", "n"=>2},
+                  {"t"=>"num", "n"=>3}]}]}]}],
 
       "{a[1, 2]}" =>
         [{"t"=>"exps",
@@ -248,34 +241,25 @@ describe 'MaboStringParser' do
            [{"t"=>"vcall",
              "a"=>
               [{"t"=>"iden", "s"=>"a"},
-               {"t"=>"sqidx",
-                "a"=>
-                 [{"t"=>"comexps",
-                   "a"=>[{"t"=>"num", "n"=>1}, {"t"=>"num", "n"=>2}]}]}]}]}],
+               {"t"=>"comexps", "a"=>[
+                 {"t"=>"num", "n"=>1}, {"t"=>"num", "n"=>2}]}]}]}],
 
       "{a.b}" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"vcall",
-             "a"=>
-              [{"t"=>"iden", "s"=>"a"},
-               {"t"=>"doidx", "a"=>[{"t"=>"iden", "s"=>"b"}]}]}]}],
+           [{"t"=>"vcall", "a"=>[
+             {"t"=>"iden", "s"=>"a"}, {"t"=>"iden", "s"=>"b"}]}]}],
 
       "{a.0}" =>
         [{"t"=>"exps",
-          "a"=>
-           [{"t"=>"vcall",
-             "a"=>
-              [{"t"=>"iden", "s"=>"a"},
-               {"t"=>"doidx", "a"=>[{"t"=>"num", "n"=>0}]}]}]}],
+          "a"=>[{"t"=>"vcall", "a"=>[
+            {"t"=>"iden", "s"=>"a"}, {"t"=>"num", "n"=>0}]}]}],
 
       "{a.-1}" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"vcall",
-             "a"=>
-              [{"t"=>"iden", "s"=>"a"},
-               {"t"=>"doidx", "a"=>[{"t"=>"num", "n"=>-1}]}]}]}],
+           [{"t"=>"vcall", "a"=>[
+             {"t"=>"iden", "s"=>"a"}, {"t"=>"num", "n"=>-1}]}]}],
 
       "{-1}" =>
         [{"t"=>"exps", "a"=>[{"t"=>"num", "n"=>-1}]}],

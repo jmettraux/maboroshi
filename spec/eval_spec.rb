@@ -88,6 +88,14 @@ describe 'MaboTableSet' do
 
         "{ 4 * (2 + 3) }" => 20,
 
+        "{ a = [ 0, 1, 2 ]; a[1] }" => 1,
+        "{ a = [ 0, 1, 2 ]; a[2] }" => 2,
+        "{ a = [ 0, 1, 2 ]; a[3] }" => nil,
+        #"{ a = [ 0, 1, 2 ]; a[-1] }" => 2,
+
+        "{ h = { age: 33 }; h['age'] }" => 33,
+        "{ h = {}; h['age'] }" => nil,
+
       }.each do |k, v|
 
         it "evals #{k.inspect}" do
