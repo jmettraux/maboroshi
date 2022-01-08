@@ -86,6 +86,8 @@ describe 'MaboTableSet' do
         "{ {,} }" => {},
         "{ { ab: 1, cd: 2, } }" => { 'ab' => 1, 'cd' => 2 },
 
+        "{ 4 * (2 + 3) }" => 20,
+
       }.each do |k, v|
 
         it "evals #{k.inspect}" do

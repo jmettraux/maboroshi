@@ -24,6 +24,9 @@ describe 'MaboStringParser' do
       "foo bar" => [
         { 't' => 'sqs', 's' => 'foo bar' } ],
 
+      "{;;}" =>
+        [{"t"=>"exps", "a"=>[]}],
+
       "a {@ status} goblin" => [
         {"t"=>"sqs", "s"=>"a "},
         {"t"=>"exps", "a"=>[{"t"=>"table", "s"=>"status"}]},
@@ -366,6 +369,21 @@ describe 'MaboStringParser' do
                   [{"t"=>"iden", "s"=>"hp"}, {"t"=>"num", "n"=>10}],
                   [{"t"=>"iden", "s"=>"ac"}, {"t"=>"num", "n"=>15}],
                   [{"t"=>"iden", "s"=>"atk"}, {"t"=>"num", "n"=>3}]]}]}]}],
+
+      "{ 1 * (2 + 3) }" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"exp",
+             "a"=>
+              [{"t"=>"num", "n"=>1},
+               {"t"=>"sop", "s"=>"*"},
+               {"t"=>"par",
+                "a"=>
+                 [{"t"=>"exp",
+                   "a"=>
+                    [{"t"=>"num", "n"=>2},
+                     {"t"=>"sop", "s"=>"+"},
+                     {"t"=>"num", "n"=>3}]}]}]}]}],
 
     }.each do |k, v|
 
