@@ -49,11 +49,12 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
   function comexps(i)  { return jseq('comexps', i, exp, comma); }
 
-  function coexps(i)   { return jseq(null, i, exp, colon); }
-  function scoexps(i)  { return jseq(null, i, exp, semco); }
+  function coexp(i) { return seq(null, i, exp_qmark, colon); }
+  function colexps(i) {return seq('colexps', i, coexp, '+', exp_qmark); }
 
-  function colexps(i)  { return seq('colexps', i, exp, colon, coexps); }
-  function scolexps(i) { return seq('scolexps', i, exp, semco, scoexps); }
+  function scolexp(i) { return seq(null, i, exp_qmark, semco); }
+  function scolexps(i) {return seq('scolexps', i, scolexp, '+', exp_qmark); }
+  function scolexpz(i) {return jseq('scolexps', i, exp_qmark, semco); }
 
   function sqexps(i) { return alt(null, i, scolexps, colexps, comexps); }
 
@@ -82,7 +83,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
   function list(i) { return eseq('list', i, sqstart, exp_qmark, comma, sqend); }
 
-  function par(i) { return seq('par', i, parstart, scoexps, parend); }
+  function par(i) { return seq('par', i, parstart, scolexpz, parend); }
 
   function val(i) {
     return alt(null, i,
@@ -141,7 +142,8 @@ var MaboStringParser = Jaabro.makeParser(function() {
   var rewrite_scolexps = _rewrite_nsub;
   var rewrite_exps = _rewrite_nsub;
 
-  var rewrite_par = _rewrite_nsub;
+  function rewrite_par(t) {
+    return { t: 'par', a: rewrite(t.sublookup('scolexps')).a }; };
 
   function rewrite_exp(t) {
 
