@@ -96,6 +96,12 @@ describe 'MaboTableSet' do
         "{ h = { age: 33 }; h['age'] }" => 33,
         "{ h = {}; h['age'] }" => nil,
 
+        "{ [ 1, 2 ] + [ 3, 4 ] }" => [ 1, 2, 3, 4 ],
+        "{ { ab: 1 } + { ab: 2, cd: 3 } }" => { 'ab' => 2, 'cd' => 3 },
+
+        #"{ [ 1, 2 ] + 3 + [ 4 ] ] }" => [ 1, 2, 3, 4 ],
+          # TODO
+
       }.each do |k, v|
 
         it "evals #{k.inspect}" do

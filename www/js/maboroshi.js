@@ -317,11 +317,23 @@ var MaboTableSet = (function() {
   evals.sum = function(set, n) {
 //clog('evals.sum', n);
     var mod = 1;
-    var r = 0;
+    var r;
     for (var i = 0, l = n.a.length; i < l; i++) {
       var e = n.a[i];
-      if (e.t === 'sop') {
-        mod = e.s === '+' ? 1 : -1;
+      if (i === 0) {
+        r = evalNode(set, e);
+      }
+      else if (e.t === 'sop') {
+        mod = (e.s === '+') ? 1 : -1;
+      }
+      else if (Array.isArray(r)) {
+        var ee = evalNode(set, e);
+        if (Array.isArray(ee)) { r = r.concat(ee); }
+        else { r.push(ee); }
+      }
+      else if (typeof r === 'object') {
+        var ee = evalNode(set, e);
+        Object.assign(r, ee);
       }
       else if (typeof r === 'string') {
         r = r + evalNode(set, e);
