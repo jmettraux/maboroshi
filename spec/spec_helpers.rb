@@ -27,9 +27,11 @@ module Helpers
         src
       end
     $browser ||=
-      Ferrum::Browser.new(js_errors: true)
+      Ferrum::Browser.new(
+        js_errors: true,
+        extensions: [ { source: $sources } ])
 
-    s1 = "JSON.stringify((function() { #{$sources}; #{s}; })())"
+    s1 = "JSON.stringify((function() { #{s}; })())"
 
     j =
       begin
