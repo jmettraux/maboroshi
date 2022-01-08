@@ -253,7 +253,9 @@ var MaboTableSet = (function() {
   };
 
   var aviComexps = function(value, index) {
-    return value[index.a[0]];
+    var i = index.a[0];
+    if (i < 0 && Array.isArray(value)) i = value.length + i;
+    return value[i];
   };
   var isComexps = function(o) {
     if (typeof o !== 'object') return false;
