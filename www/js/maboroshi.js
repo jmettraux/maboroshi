@@ -574,6 +574,8 @@ var MaboTableSet = (function() {
   this.debugEval = function(s) {
 
     var t = MaboStringParser.parse(s);
+    if ( ! t) throw "Failed to parse " + JSON.stringify(s);
+
     var h = arguments[1] || { vars: {} };
 
     return [ evalNode(h, t[0]), h ];
