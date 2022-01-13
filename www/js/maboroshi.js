@@ -99,7 +99,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function seorr(i) { return rex('sop', i, /\s*\|\|\s*/); }
 
   function heter(i) { return seq('heter', i, eorr, qmark, eorr, colon); }
-  function heass(i) { return seq('heass', i, vname, equal); }
+  function heass(i) { return seq('heass', i, ocall, equal); }
 
   function emod(i) { return jseq('exp', i, val, semod); }
   function eprd(i) { return jseq('exp', i, emod, seprd); }
@@ -184,10 +184,11 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
   function rewrite_dice(t) { return rewrite(t.children[0]); }
 
-  function rewrite_ocall(t) {
-    var tt = _rewrite_nsub(t);
-    return (tt.a.length === 1) ? tt.a[0] : tt;
-  }
+  //function rewrite_ocall(t) {
+  //  var tt = _rewrite_nsub(t);
+  //  return (tt.a.length === 1) ? tt.a[0] : tt;
+  //}
+  var rewrite_ocall = _rewrite_nsub;
 
   var rewrite_list = _rewrite_nsub;
 
@@ -209,10 +210,16 @@ var MaboTableSet = (function() {
 
   // protected functions
 
+  var alast = function(arr) { return arr.slice(-1)[0]; };
+  var abody = function(arr) { return arr.slice(0, arr.length - 1); };
+
   var random = function(max) {
     return 1 + Math.floor(Math.random() * (max - 1)); };
 
   var evals = {};
+
+  evals._getRoot = function(set) {
+    return set.parent ? evals._getRoot(set.parent) : set.vars; };
 
   evals.dict = function(set, n) {
     return n.a.reduce(
@@ -245,7 +252,7 @@ var MaboTableSet = (function() {
   evals.vname = function(set, n) {
     if (n.s.match(/^[A-Z][A-Z0-9_]*$/)) {
       var root = set; while (root.parent) root = root.parent;
-      return root.vars[n.s];
+      return evals._getRoot(set).vars[n.s];
     }
     else {
       var s = set;
@@ -355,19 +362,61 @@ var MaboTableSet = (function() {
     if (op.match(/^>=?|<=?$/)) return evals.lgt(set, n);
     throw "evals. op " + op + " not implemented."; };
 
-  evals._ass = function(set, n) {
-    var l = n.a.length;
-    var vnames = [];
-    for (var i = 0; i < l; i++) {
-      var nn = n.a[i]; if (nn.t !== 'heass') break;
-      vnames.push(nn.a[0].s);
+    // "{ a = [ 1, 2 ]; a[1] = 'deux' }" =>
+    //   [{"t"=>"exps",
+    //     "a"=>
+    //      [{"t"=>"exp",
+    //        "a"=>
+    //         [{"t"=>"heass", "a"=>[ // <------------------------------------
+    //           {"t"=>"ocall", "a"=>[{"t"=>"vname", "s"=>"a"}]}]},
+    //          {"t"=>"ocall",
+    //           "a"=>
+    //            [{"t"=>"list", "a"=>[
+    //              {"t"=>"num", "n"=>1}, {"t"=>"num", "n"=>2}]}]}]},
+    //       {"t"=>"exp",
+    //        "a"=>
+    //         [{"t"=>"heass", // <-------------------------------------------
+    //           "a"=>
+    //            [{"t"=>"ocall",
+    //              "a"=>
+    //               [{"t"=>"vname", "s"=>"a"},
+    //                {"t"=>"comexps", "a"=>[{"t"=>"num", "n"=>1}]}]}]},
+    //          {"t"=>"sqs", "s"=>"'deux'"}]}]}],
+    //
+  evals._setVal = function(set, n, val) {
+//clog('_setVal()', 'n', n, 'val', val);
+    var ocn = n.a[0]; // ocall node
+    var cns = abody(ocn.a);
+    var kn = alast(ocn.a);
+//clog('_setVal()', 'kn', kn);
+    //var k = evalNode(set, kn);
+//clog('_setVal()', 'kn', kn, 'k', k);
+
+    if (cns.length < 1) {
+      var k = kn.s;
+      var c = k.match(/^[A-Z][A-Z0-9_]*$/) ? evals._getRoot(set) : set.vars;
+      c[k] = val;
     }
-    var val = evalNode(set, n.a[l - 1]);
-    var root = set; while(root.parent) root = root.parent;
-    vnames.forEach(function(vn) {
-      if (vn.match(/^[A-Z][A-Z0-9_]*$/)) set.vars[vn] = val;
-      else root.vars[vn] = val;
-    });
+    else {
+      var ocn1 = { t: 'ocall', a: cns };
+//clog('_setVal()', 'ocn1', ocn1);
+      var c = evalNode(set, ocn1);
+//clog('_setVal()', 'c', c);
+      if (kn.t === 'comexps') {
+        var ces = kn.a.map(function(nn) { return evalNode(set, nn); });
+//clog('_setVal()', 'ces', ces);
+        var k = ces[0];
+        c[k] = val;
+      }
+      else {
+        throw `evals._setVal() TODO implement for ${JSON.stringify(kn)}`;
+      }
+    }
+  };
+
+  evals._ass = function(set, n) {
+    var val = evalNode(set, alast(n.a));
+    abody(n.a).forEach(function(nn) { evals._setVal(set, nn, val); });
     return val; };
 
   evals.exp = function(set, n) {

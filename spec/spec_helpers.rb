@@ -42,6 +42,10 @@ module Helpers
       end
 
     JSON.parse(j)
+
+  rescue JSON::ParserError
+
+    raise ::StandardError.new(j)
   end
 
   def print_tree(n, indent=0)

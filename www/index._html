@@ -62,6 +62,10 @@
       var clog = console.log;
       var cerr = console.error;
 
+      var cjog = function() {
+        Array.from(arguments)
+          .forEach(function(a) { console.log('j>', JSON.stringify(a)); }); }
+
       var qrwidth = 168;
 
       var roll = function(table) {

@@ -101,6 +101,8 @@ describe 'MaboTableSet' do
 
         "{ [ 1, 2 ] + 3 + [ 4 ] }" => [ 1, 2, 3, 4 ],
 
+        "{ a = [ 0, 1, 2 ]; a[1] = 'un'; a }" => [ 0, 'un', 2 ],
+
       }.each do |k, v|
 
         it "evals #{k.inspect}" do
