@@ -698,6 +698,8 @@ var MaboTableSet = (function() {
       a: n.a.map(function(nn) { return evalNode(set, nn); }) }; };
 
   evals.comexps = evals._exps;
+  evals.colexps = evals._exps;
+  evals.scolexps = evals._exps;
 
   evals.exps = function(set, n) {
     var r = null;
@@ -725,16 +727,35 @@ var MaboTableSet = (function() {
 
   var aviComexps = function(value, index) {
     var i = index.a[0];
-    if (i < 0 && Array.isArray(value)) i = value.length + i;
+    if (i < 0) i = value.length + i;
+    var l = index.a[1];
+    if (Array.isArray(value) && l !== undefined) {
+      if (l < 0) l = value.length + l;
+      var a = []; for (i; i < l; i++) { a.push(value[i]); }
+      return a;
+    }
     return value[i];
   };
-  var isComexps = function(o) {
+  var aviColexps = function(value, index) {
+    var inc = index.a[2] || 1;
+    var a = [];
+    for (var i = index.a[0], l = i + index.a[1]; i < l; i = i + inc) {
+      a.push(value[i]);
+    }
+    return a;
+  };
+  var aviScolexps = function(value, index) {
+    return index.a.map(function(i) { return value[i]; });
+  };
+  var isT = function(t, o) {
     if (typeof o !== 'object') return false;
-    if (o.t !== 'comexps') return false;
+    if (o.t !== t) return false;
     return true;
   };
   var applyOcallIndex = function(value, index) {
-    if (isComexps(index)) return aviComexps(value, index);
+    if (isT('comexps', index)) return aviComexps(value, index);
+    if (isT('colexps', index)) return aviColexps(value, index);
+    if (isT('scolexps', index)) return aviScolexps(value, index);
     return value;
   };
 
@@ -813,6 +834,21 @@ var MaboTableSet = (function() {
     return r;
   };
 
+      // "{1 > 2}" =>
+      //   [{"t"=>"exps",
+      //     "a"=>
+      //      [{"t"=>"exp",
+      //        "a"=>
+      //         [{"t"=>"num", "n"=>1},
+      //          {"t"=>"sop", "s"=>">"},
+      //          {"t"=>"num", "n"=>2}]}]}],
+      //
+  evals.lgt = function(set, n) {
+clog(n);
+return false;
+return n;
+  };
+
   evals._op = function(set, n) {
     var op = n.a[1].s;
     if (op === '%') return evals.mod(set, n);
@@ -821,45 +857,12 @@ var MaboTableSet = (function() {
     if (op.match(/^>=?|<=?$/)) return evals.lgt(set, n);
     throw "evals. op " + op + " not implemented."; };
 
-//  evals._ocall = function(set, n) {
-//    var bns = abody(n.a[0].a);
-//    var ln = alast(n.a[0].a);
-//    var con = bns.length < 1 ?
-//      null :
-//      evalNode(set, { t: 'ocall', a: bns });
-//    //var key = ln.t === 'vname' ?
-//    //  ln.s :
-//    //  evalNode(set, ln);
-//    return [ con, ln ];
-//  };
-
-    // "{ a = [ 1, 2 ]; a[1] = 'deux' }" =>
-    //   [{"t"=>"exps",
-    //     "a"=>
-    //      [{"t"=>"exp",
-    //        "a"=>
-    //         [{"t"=>"heass", "a"=>[ // <------------------------------------
-    //           {"t"=>"ocall", "a"=>[{"t"=>"vname", "s"=>"a"}]}]},
-    //          {"t"=>"ocall",
-    //           "a"=>
-    //            [{"t"=>"list", "a"=>[
-    //              {"t"=>"num", "n"=>1}, {"t"=>"num", "n"=>2}]}]}]},
-    //       {"t"=>"exp",
-    //        "a"=>
-    //         [{"t"=>"heass", // <-------------------------------------------
-    //           "a"=>
-    //            [{"t"=>"ocall",
-    //              "a"=>
-    //               [{"t"=>"vname", "s"=>"a"},
-    //                {"t"=>"comexps", "a"=>[{"t"=>"num", "n"=>1}]}]}]},
-    //          {"t"=>"sqs", "s"=>"'deux'"}]}]}],
-
   evals._setVal = function(set, n, val) {
 //clog('_setVal()', 'n', n, 'val', val);
     var ocn = n.a[0]; // ocall node
     var cns = abody(ocn.a);
     var kn = alast(ocn.a);
-clog('_setVal()', 'kn', kn);
+//clog('_setVal()', 'kn', kn);
     //var k = evalNode(set, kn);
 //clog('_setVal()', 'kn', kn, 'k', k);
 
@@ -870,65 +873,60 @@ clog('_setVal()', 'kn', kn);
     }
     else {
       var ocn1 = { t: 'ocall', a: cns };
-clog('_setVal()', 'ocn1', ocn1);
+//clog('_setVal()', 'ocn1', ocn1);
       var c = evalNode(set, ocn1);
-clog('_setVal()', 'c', c);
+//clog('_setVal()', 'c', c);
       if (kn.t === 'comexps') {
         var ces = kn.a.map(function(nn) { return evalNode(set, nn); });
-clog('_setVal()', 'ces', ces);
-        var k = ces[0];
-        c[k] = val;
+//clog('_setVal()', 'ces', ces);
+        var ks = ces[0];
+        var ke = ces[1] || ces[0] + 1;
+        if (typeof ke === 'number') {
+          for (var i = ks; i < ke; i++) c[i] = val;
+        }
+        else {
+          c[ks] = val;
+        }
+      }
+      else if (kn.t === 'scolexps') {
+        kn.a.forEach(function(nn) {
+          var i = evalNode(set, nn); c[i] = val; }); }
+      else if (kn.t === 'vname') {
+        c[kn.s] = val;
       }
       else {
         throw `evals._setVal() TODO implement for ${JSON.stringify(kn)}`;
       }
     }
-
-//clog('_setVal()', 'ocn', ocn, 'val', val);
-//    // 1 determine container
-//clog('_setVal()', 'ocn1', ocn1);
-//    // 2 determine key
-//    // 3 assign
   };
 
   evals._ass = function(set, n) {
     var val = evalNode(set, alast(n.a));
-    abody(n.a)
-      .forEach(function(nn) {
-        evals._setVal(set, nn, val); });
-        //var ck = evals._ocall(set, nn);
-        //var c = ck[0]; var k = ck[1];
-        //c =
-        //  c ? c :
-        //  k.match(/^[A-Z][A-Z0-9_]*$/) ? evals._getRoot(set) :
-        //  set.vars;
-        //setValue(c, k, val); })
-    return val; };
-//cjog(n);
-//    var conkeys = abody(n.a).map(function(kn) {
-//      return [ lookup(set, abody(kn.a)), evalNode(set, alast(kn.a)) ];
-//    });
-//clog('conkeys', conkeys);
-//    var val = evalNode(set, alast(n.a));
-//    conkeys.forEach(function(ck) { ck[0][ck[1]] = val; });
-//  };
-    //var l = n.a.length;
-    //var vnames = [];
-    //for (var i = 0; i < l; i++) {
-    //  var nn = n.a[i]; if (nn.t !== 'heass') break;
-    //  vnames.push(nn.a[0].s);
-    //}
-    //var val = evalNode(set, n.a[l - 1]);
-    //var root = set; while(root.parent) root = root.parent;
-    //vnames.forEach(function(vn) {
-    //  if (vn.match(/^[A-Z][A-Z0-9_]*$/)) set.vars[vn] = val;
-    //  else root.vars[vn] = val;
-    //});
-    //return val; };
+    abody(n.a).forEach(function(nn) { evals._setVal(set, nn, val); });
+    return val;
+  };
+
+      // "{TRUE ? 0 : 1 }" =>
+      //   [{"t"=>"exps",
+      //     "a"=>
+      //      [{"t"=>"exp", <--------------------------------------------------
+      //        "a"=>
+      //         [{"t"=>"heter", "a"=>[
+      //           {"t"=>"boo", "b"=>true}, {"t"=>"num", "n"=>0}]},
+      //          {"t"=>"num", "n"=>1}]}]}],
+      //
+  evals._ter = function(set, n) {
+    var con = n.a[0].a[0];
+    var the = n.a[0].a[1];
+    var els = n.a[1];
+    return evalNode(set, con) ? evalNode(set, the) : evalNode(set, els);
+  };
 
   evals.exp = function(set, n) {
     if (n.a[0].t === 'heass') return evals._ass(set, n);
-    return evals._op(set, n); };
+    if (n.a[0].t === 'heter') return evals._ter(set, n);
+    return evals._op(set, n);
+  };
 
   var evalNode = function(set, n) {
 

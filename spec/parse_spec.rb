@@ -58,6 +58,15 @@ describe 'MaboStringParser' do
                 {"t"=>"ocall", "a"=>[{"t"=>"vname", "s"=>"b"}]}]},
                {"t"=>"num", "n"=>2}]}]}],
 
+      "{TRUE ? 0 : 1 }" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"exp",
+             "a"=>
+              [{"t"=>"heter", "a"=>[
+                {"t"=>"boo", "b"=>true}, {"t"=>"num", "n"=>0}]},
+               {"t"=>"num", "n"=>1}]}]}],
+
       "{a ? b : c}" =>
         [{"t"=>"exps",
           "a"=>
@@ -116,6 +125,15 @@ describe 'MaboStringParser' do
               [{"t"=>"ocall", "a"=>[{"t"=>"vname", "s"=>"a"}]},
                {"t"=>"sop", "s"=>"=="},
                {"t"=>"ocall", "a"=>[{"t"=>"vname", "s"=>"b"}]}]}]}],
+
+      "{1 > 2}" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"exp",
+             "a"=>
+              [{"t"=>"num", "n"=>1},
+               {"t"=>"sop", "s"=>">"},
+               {"t"=>"num", "n"=>2}]}]}],
 
       "{a >= b < c}" =>
         [{"t"=>"exps",

@@ -375,6 +375,26 @@ var MaboTableSet = (function() {
     return r;
   };
 
+      // "{1 > 2}" =>
+      //   [{"t"=>"exps",
+      //     "a"=>
+      //      [{"t"=>"exp",
+      //        "a"=>
+      //         [{"t"=>"num", "n"=>1},
+      //          {"t"=>"sop", "s"=>">"},
+      //          {"t"=>"num", "n"=>2}]}]}],
+      //
+  evals.lgt = function(set, n) {
+    var a = evalNode(set, n.a[0]);
+    var b = evalNode(set, n.a[2]);
+    var op = n.a[1].s;
+    if (op === '>') return a > b;
+    if (op === '>=') return a >= b;
+    if (op === '<') return a < b;
+    if (op === '<=') return a <= b;
+    return false;
+  };
+
   evals._op = function(set, n) {
     var op = n.a[1].s;
     if (op === '%') return evals.mod(set, n);
@@ -429,11 +449,30 @@ var MaboTableSet = (function() {
   evals._ass = function(set, n) {
     var val = evalNode(set, alast(n.a));
     abody(n.a).forEach(function(nn) { evals._setVal(set, nn, val); });
-    return val; };
+    return val;
+  };
+
+      // "{TRUE ? 0 : 1 }" =>
+      //   [{"t"=>"exps",
+      //     "a"=>
+      //      [{"t"=>"exp", <--------------------------------------------------
+      //        "a"=>
+      //         [{"t"=>"heter", "a"=>[
+      //           {"t"=>"boo", "b"=>true}, {"t"=>"num", "n"=>0}]},
+      //          {"t"=>"num", "n"=>1}]}]}],
+      //
+  evals._ter = function(set, n) {
+    var con = n.a[0].a[0];
+    var the = n.a[0].a[1];
+    var els = n.a[1];
+    return evalNode(set, con) ? evalNode(set, the) : evalNode(set, els);
+  };
 
   evals.exp = function(set, n) {
     if (n.a[0].t === 'heass') return evals._ass(set, n);
-    return evals._op(set, n); };
+    if (n.a[0].t === 'heter') return evals._ter(set, n);
+    return evals._op(set, n);
+  };
 
   var evalNode = function(set, n) {
 
