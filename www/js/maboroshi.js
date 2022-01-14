@@ -239,6 +239,8 @@ var MaboTableSet = (function() {
       a: n.a.map(function(nn) { return evalNode(set, nn); }) }; };
 
   evals.comexps = evals._exps;
+  evals.colexps = evals._exps;
+  evals.scolexps = evals._exps;
 
   evals.exps = function(set, n) {
     var r = null;
@@ -266,16 +268,35 @@ var MaboTableSet = (function() {
 
   var aviComexps = function(value, index) {
     var i = index.a[0];
-    if (i < 0 && Array.isArray(value)) i = value.length + i;
+    if (i < 0) i = value.length + i;
+    var l = index.a[1];
+    if (Array.isArray(value) && l !== undefined) {
+      if (l < 0) l = value.length + l;
+      var a = []; for (i; i < l; i++) { a.push(value[i]); }
+      return a;
+    }
     return value[i];
   };
-  var isComexps = function(o) {
+  var aviColexps = function(value, index) {
+    var inc = index.a[2] || 1;
+    var a = [];
+    for (var i = index.a[0], l = i + index.a[1]; i < l; i = i + inc) {
+      a.push(value[i]);
+    }
+    return a;
+  };
+  var aviScolexps = function(value, index) {
+    return index.a.map(function(i) { return value[i]; });
+  };
+  var isT = function(t, o) {
     if (typeof o !== 'object') return false;
-    if (o.t !== 'comexps') return false;
+    if (o.t !== t) return false;
     return true;
   };
   var applyOcallIndex = function(value, index) {
-    if (isComexps(index)) return aviComexps(value, index);
+    if (isT('comexps', index)) return aviComexps(value, index);
+    if (isT('colexps', index)) return aviColexps(value, index);
+    if (isT('scolexps', index)) return aviScolexps(value, index);
     return value;
   };
 
