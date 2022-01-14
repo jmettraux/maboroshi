@@ -375,24 +375,19 @@ var MaboTableSet = (function() {
     return r;
   };
 
-      // "{1 > 2}" =>
-      //   [{"t"=>"exps",
-      //     "a"=>
-      //      [{"t"=>"exp",
-      //        "a"=>
-      //         [{"t"=>"num", "n"=>1},
-      //          {"t"=>"sop", "s"=>">"},
-      //          {"t"=>"num", "n"=>2}]}]}],
-      //
   evals.lgt = function(set, n) {
-    var a = evalNode(set, n.a[0]);
-    var b = evalNode(set, n.a[2]);
-    var op = n.a[1].s;
-    if (op === '>') return a > b;
-    if (op === '>=') return a >= b;
-    if (op === '<') return a < b;
-    if (op === '<=') return a <= b;
-    return false;
+    var c = {};
+    var r = true;
+    for (var i = 0, l = n.a.length; r && i + 2 < l; i = i + 2) {
+      var a = c[i] || evalNode(set, n.a[i]); c[i] = a;
+      var b = c[i + 2] || evalNode(set, n.a[i + 2]); c[i + 2] = b;
+      var op = n.a[i + 1].s;
+      if (op === '>') r = a > b;
+      else if (op === '>=') r = a >= b;
+      else if (op === '<') r = a < b;
+      else if (op === '<=') r =  a <= b;
+    };
+    return r;
   };
 
   evals._op = function(set, n) {

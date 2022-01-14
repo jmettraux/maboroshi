@@ -128,8 +128,8 @@ describe 'MaboTableSet' do
         "{2 <= 3}" => true,
         "{2 <= 2}" => true,
 
-        #"{1 < 2 > 3}" => false,
-        #"{1 < 2 < 3}" => true,
+        "{1 < 2 > 3}" => false,
+        "{1 < 2 < 3}" => true,
 
         "{TRUE ? 0 : 1 }" => 0,
         "{FALSE ? 0 : 1 }" => 1,
