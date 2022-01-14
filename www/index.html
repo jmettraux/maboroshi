@@ -525,8 +525,16 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
   function index(i) { return alt(null, i, sqidx, caidx, doidx); }
 
-  function ddice(i) { return rex('ddice', i, /([dD]\d+)+/); }
+  function diced(i) { return rex(null, i, /[dD]/); }
+  function dicec(i) { return rex('dicec', i, /\d+/); }
+
+  function count_or_par { return alt(null, dicec, par); }
+
+  //function ddice(i) { return rex('ddice', i, /([dD]\d+)+/); }
+  function ddice(i) { return seq('ddice', i, diced, count_or_par); }
+
   function cdice(i) { return rex('cdice', i, /\d+[dD]\d+(k[hl]\d*)?/); }
+
   function dice(i) { return alt('dice', i, cdice, ddice); }
 
   function dentry(i) { return seq('dentry', i, vname, colon, exp); }
@@ -834,19 +842,19 @@ var MaboTableSet = (function() {
     return r;
   };
 
-      // "{1 > 2}" =>
-      //   [{"t"=>"exps",
-      //     "a"=>
-      //      [{"t"=>"exp",
-      //        "a"=>
-      //         [{"t"=>"num", "n"=>1},
-      //          {"t"=>"sop", "s"=>">"},
-      //          {"t"=>"num", "n"=>2}]}]}],
-      //
   evals.lgt = function(set, n) {
-clog(n);
-return false;
-return n;
+    var c = {};
+    var r = true;
+    for (var i = 0, l = n.a.length; r && i + 2 < l; i = i + 2) {
+      var a = c[i] || evalNode(set, n.a[i]); c[i] = a;
+      var b = c[i + 2] || evalNode(set, n.a[i + 2]); c[i + 2] = b;
+      var op = n.a[i + 1].s;
+      if (op === '>') r = a > b;
+      else if (op === '>=') r = a >= b;
+      else if (op === '<') r = a < b;
+      else if (op === '<=') r =  a <= b;
+    };
+    return r;
   };
 
   evals._op = function(set, n) {

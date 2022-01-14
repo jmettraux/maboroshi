@@ -23,6 +23,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function nil(i) { return rex('nil', i, /nil|null/i); }
   function boo(i) { return rex('boo', i, /true|false/i); }
   function num(i) { return rex('num', i, /-?\d+/); }
+  function pos(i) { return rex('pos', i, /\d+/); }
 
   function ppbstart(i) { return rex(null, i, /\{\s*/); }
   function ppbend(i)   { return rex(null, i, /\s*\}\s*/); }
@@ -66,9 +67,20 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
   function index(i) { return alt(null, i, sqidx, caidx, doidx); }
 
-  function ddice(i) { return rex('ddice', i, /([dD]\d+)+/); }
-  function cdice(i) { return rex('cdice', i, /\d+[dD]\d+(k[hl]\d*)?/); }
-  function dice(i) { return alt('dice', i, cdice, ddice); }
+  function diced(i) { return rex(null, i, /[dD]/); }
+
+  function pos_or_par(i) { return alt(null, i, pos, par); }
+
+  function ddic(i) { return seq(null, i, diced, pos_or_par); }
+  function ddice(i) { return rep('ddice', i, ddic, 1); }
+
+  function dicekhl(i) { return rex('dicehkl', i, /k[hl]/i); }
+  function dicek(i) { return seq('dicek', i, dicekhl, pos_or_par, '?'); }
+
+  function cdice(i) {
+    return seq('cdice', i, pos_or_par, diced, pos_or_par, dicek, '?'); }
+
+  function dice(i) { return alt(null, i, cdice, ddice); }
 
   function dentry(i) { return seq('dentry', i, vname, colon, exp); }
   function dentry_qmark(i) { return rep(null, i, dentry, 0, 1); }
@@ -164,30 +176,27 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function rewrite_boo(t) {
     return { t: 'boo', b: t.string().toLowerCase() === 'true' }; }
 
+  function rewrite_pos(t) {
+    return { t: 'pos', n: parseInt(t.string(), 10) }; }
+
   var rewrite_sqs = _rewrite_s;
   var rewrite_sop = _rewrite_st;
   var rewrite_vname = _rewrite_s;
 
+  function rewrite_dicehkl(t) {
+    return { t: 'dicehkl', s: t.string().toLowerCase() }; }
+
+  var rewrite_dicek = _rewrite_nsub;
+
   function rewrite_cdice(t) {
-    var m = t.string().match(/^(\d+)[dD](\d+)(k[hl]\d*)?$/);
-    var r = { t: 'dice', c: parseInt(m[1], 10), d: parseInt(m[2], 10) };
-    m = m[3] && m[3].match(/^(k[hl])(\d*)$/);
-    if (m) r[m[1]] = m[2].length > 0 ? parseInt(m[2], 10) : 1;
-    return r; }
+    var a = t.subgather().map(rewrite);
+    var a1 = a.slice(0, 2);
+    if (a[2]) a1 = a1.concat(a[2].a);
+    return { t: 'cdice', a: a1 };
+  }
 
-  function rewrite_ddice(t) {
-    var ds = t.string()
-      .split(/[dD]/)
-      .slice(1)
-      .map(function(e) { return parseInt(e, 10); });
-    return { t: 'dice', ds: ds }; }
+  var rewrite_ddice = _rewrite_nsub;
 
-  function rewrite_dice(t) { return rewrite(t.children[0]); }
-
-  //function rewrite_ocall(t) {
-  //  var tt = _rewrite_nsub(t);
-  //  return (tt.a.length === 1) ? tt.a[0] : tt;
-  //}
   var rewrite_ocall = _rewrite_nsub;
 
   var rewrite_list = _rewrite_nsub;
