@@ -384,8 +384,14 @@ var MaboTableSet = (function() {
       if (kn.t === 'comexps') {
         var ces = kn.a.map(function(nn) { return evalNode(set, nn); });
 //clog('_setVal()', 'ces', ces);
-        var k = ces[0];
-        c[k] = val;
+        var ks = ces[0];
+        var ke = ces[1] || ces[0] + 1;
+        if (typeof ke === 'number') {
+          for (var i = ks; i < ke; i++) c[i] = val;
+        }
+        else {
+          c[ks] = val;
+        }
       }
       else if (kn.t === 'vname') {
         c[kn.s] = val;

@@ -103,6 +103,9 @@ describe 'MaboTableSet' do
 
         "{ a = [ 0, 1, 2 ]; a[1] = 'un'; a }" => [ 0, 'un', 2 ],
 
+        "{ a = [ 0, 1, 2 ]; a[1, 4] = 'x'; a }" => [ 0, 'x', 'x', 'x' ],
+          # end not included
+
         "{ h = { age: 7 }; h['age'] = 1; h }" => { 'age' => 1 },
         "{ h = { age: 7 }; h['ag' + 'e'] = 2; h }" => { 'age' => 2 },
         "{ h = { age: 7 }; h.age = 3; h }" => { 'age' => 3 },
