@@ -362,27 +362,6 @@ var MaboTableSet = (function() {
     if (op.match(/^>=?|<=?$/)) return evals.lgt(set, n);
     throw "evals. op " + op + " not implemented."; };
 
-    // "{ a = [ 1, 2 ]; a[1] = 'deux' }" =>
-    //   [{"t"=>"exps",
-    //     "a"=>
-    //      [{"t"=>"exp",
-    //        "a"=>
-    //         [{"t"=>"heass", "a"=>[ // <------------------------------------
-    //           {"t"=>"ocall", "a"=>[{"t"=>"vname", "s"=>"a"}]}]},
-    //          {"t"=>"ocall",
-    //           "a"=>
-    //            [{"t"=>"list", "a"=>[
-    //              {"t"=>"num", "n"=>1}, {"t"=>"num", "n"=>2}]}]}]},
-    //       {"t"=>"exp",
-    //        "a"=>
-    //         [{"t"=>"heass", // <-------------------------------------------
-    //           "a"=>
-    //            [{"t"=>"ocall",
-    //              "a"=>
-    //               [{"t"=>"vname", "s"=>"a"},
-    //                {"t"=>"comexps", "a"=>[{"t"=>"num", "n"=>1}]}]}]},
-    //          {"t"=>"sqs", "s"=>"'deux'"}]}]}],
-    //
   evals._setVal = function(set, n, val) {
 //clog('_setVal()', 'n', n, 'val', val);
     var ocn = n.a[0]; // ocall node
@@ -407,6 +386,9 @@ var MaboTableSet = (function() {
 //clog('_setVal()', 'ces', ces);
         var k = ces[0];
         c[k] = val;
+      }
+      else if (kn.t === 'vname') {
+        c[kn.s] = val;
       }
       else {
         throw `evals._setVal() TODO implement for ${JSON.stringify(kn)}`;

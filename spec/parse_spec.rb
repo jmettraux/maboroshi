@@ -484,6 +484,18 @@ describe 'MaboStringParser' do
                      {"t"=>"comexps", "a"=>[{"t"=>"num", "n"=>1}]}]}]},
                {"t"=>"sqs", "s"=>"'deux'"}]}]}],
 
+      "{ h.age = 2 }" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"exp",
+             "a"=>
+              [{"t"=>"heass",
+                "a"=>
+                 [{"t"=>"ocall",
+                   "a"=>[
+                    {"t"=>"vname", "s"=>"h"}, {"t"=>"vname", "s"=>"age"}]}]},
+               {"t"=>"num", "n"=>2}]}]}],
+
     }.each do |k, v|
 
       it "parses #{k.inspect}" do
