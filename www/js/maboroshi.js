@@ -393,6 +393,9 @@ var MaboTableSet = (function() {
           c[ks] = val;
         }
       }
+      else if (kn.t === 'scolexps') {
+        kn.a.forEach(function(nn) {
+          var i = evalNode(set, nn); c[i] = val; }); }
       else if (kn.t === 'vname') {
         c[kn.s] = val;
       }
