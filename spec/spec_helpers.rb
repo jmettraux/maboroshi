@@ -23,6 +23,12 @@ module Helpers
         src = %w[ www/js/jaabro-1.4.0.com.js www/js/maboroshi.js ]
           .collect { |path| File.read(path) }
           .join(';')
+        src = %{
+          window._log = [];
+          window.clog = function() {
+            window._log.push(JSON.stringify(Array.from(arguments))) };
+          window.cjog = window.clog;
+        } + src
         File.open('spec/.source.js', 'w') { |f| f.write(src) }
         src
       end
@@ -46,6 +52,15 @@ module Helpers
   rescue JSON::ParserError
 
     raise ::StandardError.new(j)
+
+  ensure
+
+    $log =
+      begin
+        $browser.evaluate('window._log').collect { |e| JSON.parse(e) }
+      rescue
+        nil
+      end
   end
 
   def print_tree(n, indent=0)
