@@ -28,25 +28,33 @@ describe 'MaboTableSet' do
         '{4d6kh}' => [ 1, 6 ],
         '{4d6kl}' => [ 1, 6 ],
 
+        '{ (1d4)d(1d6) }' => [ 1, 24 ],
+        '{ (1 + 1)d(1 + 6) }' => [ 2, 14 ],
+
+        '{ d(5 + 1)d(1 + 5) }' =>
+          (1..6).to_a.product((1..6).to_a).map { |a, b| "#{a}#{b}".to_i },
+
       }.each do |k, v|
 
         it "evals #{k.inspect}" do
 
           if v.is_a?(Array) && v.length == 2 # dice range
 
-            210.times do
+            190.times do
               r, h = evaluate("return MaboTableSet.debugEval(#{k.inspect})");
               expect(r).to be_between(*v)
             end
 
           else
 
-            210.times do
+            190.times do
               r, h = evaluate("return MaboTableSet.debugEval(#{k.inspect})");
               expect(v.include?(r)).to eq(true)
             end
-
           end
+
+        ensure
+          pp $log if $log && $log.any?
         end
       end
     end
@@ -153,6 +161,9 @@ describe 'MaboTableSet' do
             r, h = evaluate("return MaboTableSet.debugEval(#{k.inspect})");
             expect(r).to eq(v)
           end
+
+        ensure
+          pp $log if $log && $log.any?
         end
       end
     end

@@ -321,24 +321,33 @@ var MaboTableSet = (function() {
     if ( ! n.s.match(/\.md/)) throw 'unknown table "' + n.s + '"';
     t = await MaboTableSet.make(n.s);
     t.parent = set;
-    return t.roll(); };
+    return t.roll();
+  };
 
-  evals.dice = function(set, n) {
-    if (n.ds) {
-      var r = '';
-      n.ds.forEach(function(d) { r = r + random(d); });
-      return parseInt(r, 10);
-    }
-    var rs = [];
-    for (var i = 0; i < n.c; i++) { rs.push(random(n.d)); }
-    if (n.kh) rs = rs.sort().reverse().slice(0, n.kh);
-    else if (n.kl) rs = rs.sort().slice(0, n.kl);
-    return rs.reduce(function(a, b) { return a + b; }, 0); };
+  evals.ddice = function(set, n) {
+    return parseInt(
+      n.a.reduce(function(r, e) { return r + random(evalNode(set, e)); }, ''),
+      10);
+  };
+
+  evals.cdice = function(set, n) {
+//cjog(n);
+    var c = evalNode(set, n.a[0]);
+    var d = evalNode(set, n.a[1]);
+    var rs = []; for (var i = 0; i < c; i++) rs.push(random(d));
+    var k = n.a[2]; k = k && k.s;
+    var kc = n.a[3]; kc = kc && evalNode(set, kc);
+//cjog(c, d, k, kc);
+    if (k === 'kh') rs = rs.sort().reverse().slice(0, kc || 1);
+    else if (k === 'kl') rs = rs.sort().slice(0, kc || 1);
+    return rs.reduce(function(a, b) { return a + b; }, 0);
+  };
 
   evals.num = function(set, n) {
     return n.n; };
   evals.boo = function(set, n) {
     return n.b; };
+  evals.pos = evals.num;
 
   evals.prd = function(set, n) {
     var mod = 1;
