@@ -45,8 +45,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function sqstring(i) { return rex('sqs', i, /'([^']|\\')+'/); }
   function dqstring(i) { return rex('dqs', i, /"([^"]|\\")+"/); } // FIXME
 
-  function tname(i) { return rex('tname', i, /[^;}]+/); } // FIXME
-  function table(i) { return seq('table', i, atsig, tname); }
+  function table(i) { return seq('table', i, atsig, exp); }
 
   function comexps(i)  { return jseq('comexps', i, exp, comma); }
 
@@ -168,8 +167,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
   var rewrite_heass = _rewrite_nsub;
   var rewrite_heter = _rewrite_nsub;
 
-  function rewrite_table(t) {
-    return { t: 'table', s: t.lookup('tname').string() }; }
+  var rewrite_table = _rewrite_nsub;
 
   function rewrite_num(t) {
     return { t: 'num', n: parseInt(t.string(), 10) }; }

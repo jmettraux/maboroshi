@@ -27,15 +27,19 @@ describe 'MaboStringParser' do
       "{;;}" =>
         [{"t"=>"exps", "a"=>[]}],
 
-      "a {@ status} goblin" => [
-        {"t"=>"sqs", "s"=>"a "},
-        {"t"=>"exps", "a"=>[{"t"=>"table", "s"=>"status"}]},
-        {"t"=>"sqs", "s"=>" goblin"}],
+      "a {@ status} goblin" =>
+        [{"t"=>"sqs", "s"=>"a "},
+         {"t"=>"exps",
+          "a"=>
+           [{"t"=>"table",
+             "a"=>[{"t"=>"ocall", "a"=>[{"t"=>"vname", "s"=>"status"}]}]}]},
+         {"t"=>"sqs", "s"=>" goblin"}],
 
       "{@ status; 1d6} orc" =>
         [{"t"=>"exps",
           "a"=>
-           [{"t"=>"table", "s"=>"status"},
+           [{"t"=>"table",
+             "a"=>[{"t"=>"ocall", "a"=>[{"t"=>"vname", "s"=>"status"}]}]},
             {"t"=>"cdice", "a"=>[{"t"=>"pos", "n"=>1}, {"t"=>"pos", "n"=>6}]}]},
          {"t"=>"sqs", "s"=>" orc"}],
 
@@ -267,7 +271,9 @@ describe 'MaboStringParser' do
              "a"=>
               [{"t"=>"heass", "a"=>[
                 {"t"=>"ocall", "a"=>[{"t"=>"vname", "s"=>"a"}]}]},
-               {"t"=>"table", "s"=>"table"}]}]}],
+               {"t"=>"table",
+                "a"=>[
+                 {"t"=>"ocall", "a"=>[{"t"=>"vname", "s"=>"table"}]}]}]}]}],
 
       "{a = 'a small single quoted string}\"'}" =>
         [{"t"=>"exps",
@@ -293,7 +299,10 @@ describe 'MaboStringParser' do
                 {"t"=>"ocall", "a"=>[{"t"=>"vname", "s"=>"b"}]}]},
                {"t"=>"num", "n"=>2}]}]},
          {"t"=>"sqs", "s"=>"\n" + "Hello World! "},
-         {"t"=>"exps", "a"=>[{"t"=>"table", "s"=>"table"}]}],
+         {"t"=>"exps",
+          "a"=>
+           [{"t"=>"table",
+             "a"=>[{"t"=>"ocall", "a"=>[{"t"=>"vname", "s"=>"table"}]}]}]}],
 
       "{fun(1, '2', b)}" =>
         [{"t"=>"exps",
