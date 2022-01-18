@@ -149,6 +149,9 @@ describe 'MaboTableSet' do
         "{ 2 * 3 }" => 6,
         "{ 'a' * 3 }" => 'aaa',
 
+        #"{ parseInt }" => 0,
+        "{ parseInt('12') }" => 12,
+
       }.each do |k, v|
 
         it "evals #{k.inspect}" do

@@ -291,6 +291,9 @@ var MaboTableSet = (function() {
   };
 
   var aviComexps = function(value, index) {
+    if ((typeof value) === 'function') {
+      return value.apply(null, index.a);
+    }
     var i = index.a[0];
     if (i < 0) i = value.length + i;
     var l = index.a[1];
@@ -495,15 +498,6 @@ var MaboTableSet = (function() {
     return val;
   };
 
-      // "{TRUE ? 0 : 1 }" =>
-      //   [{"t"=>"exps",
-      //     "a"=>
-      //      [{"t"=>"exp", <--------------------------------------------------
-      //        "a"=>
-      //         [{"t"=>"heter", "a"=>[
-      //           {"t"=>"boo", "b"=>true}, {"t"=>"num", "n"=>0}]},
-      //          {"t"=>"num", "n"=>1}]}]}],
-      //
   evals._ter = function(set, n) {
     var con = n.a[0].a[0];
     var the = n.a[0].a[1];
@@ -518,6 +512,10 @@ var MaboTableSet = (function() {
   };
 
   var evalNode = function(set, n) {
+
+    if ( ! set.parent) for (var k in funcs) {
+      if ( ! set.vars.hasOwnProperty(k)) set.vars[k] = funcs[k];
+    }
 
 //clog('evalNode()', n);
     var ev = evals[n.t];
@@ -712,7 +710,11 @@ var MaboTableSet = (function() {
     return r;
   };
 
+  var funcs = {}; // filled below...
+
   // public functions
+
+  this.funcs = funcs;
 
   this.debugEval = function(s) {
 
@@ -721,7 +723,9 @@ var MaboTableSet = (function() {
 
     var h = arguments[1] || { vars: {} };
 
-    return [ evalNode(h, t[0]), h ];
+    return [
+      evalNode(h, t[0]),
+      h ];
   };
 
   this.doMake = function(uri, s) {
@@ -747,4 +751,8 @@ var MaboTableSet = (function() {
   return this;
 
 }).apply({}); // end MaboTableSet
+
+
+MaboTableSet.funcs.parseInt = function(s) {
+  return parseInt(s, 10); };
 
