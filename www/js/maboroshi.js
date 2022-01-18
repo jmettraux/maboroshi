@@ -369,8 +369,23 @@ var MaboTableSet = (function() {
     var r = 1;
     for (var i = 0, l = n.a.length; i < l; i++) {
       var e = n.a[i];
-      if (e.t === 'sop') mod = e.s === '*' ? 1 : -1;
-      else r = r * Math.pow(evalNode(set, e), mod);
+      if (e.t === 'sop') {
+        mod = e.s === '*' ? 1 : -1;
+      }
+      else {
+        var ee = evalNode(set, e);
+        if (typeof r === 'number' && typeof ee !== 'number') {
+          r = ee;
+        }
+        else if (typeof r === 'string' && typeof ee === 'number') {
+          var r0 = r;
+          r = '';
+          for (var j = 0; j < ee; j++) { r = r + r0; }
+        }
+        else {
+          r = r * Math.pow(evalNode(set, e), mod);
+        }
+      }
     }
     return r;
   }

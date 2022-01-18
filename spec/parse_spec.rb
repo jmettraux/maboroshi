@@ -620,6 +620,15 @@ describe 'MaboStringParser' do
                {"t"=>"str", "s"=>" goblin"}]}]},
          {"t"=>"str", "s"=>" just entered "}],
 
+      "{ 'a' * 3 }" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"exp",
+             "a"=>
+              [{"t"=>"str", "s"=>"a"},
+               {"t"=>"sop", "s"=>"*"},
+               {"t"=>"num", "n"=>3}]}]}],
+
     }.each do |k, v|
 
       it "parses #{k.inspect}" do

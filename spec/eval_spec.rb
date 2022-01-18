@@ -146,6 +146,9 @@ describe 'MaboTableSet' do
 
         %{{ "an { 'angry' } goblin" }} => "an angry goblin",
 
+        "{ 2 * 3 }" => 6,
+        "{ 'a' * 3 }" => 'aaa',
+
       }.each do |k, v|
 
         it "evals #{k.inspect}" do
