@@ -144,6 +144,8 @@ describe 'MaboTableSet' do
         "{1 > 0 ? 0 : 1 }" => 0,
         "{1 < 0 ? 0 : 1 }" => 1,
 
+        %{{ "an { 'angry' } goblin" }} => "an angry goblin",
+
       }.each do |k, v|
 
         it "evals #{k.inspect}" do

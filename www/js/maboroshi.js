@@ -43,7 +43,13 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function vname(i) { return rex('vname', i, /[a-zA-Z][a-zA-Z0-9_]*/); }
 
   function sqstring(i) { return rex('sqs', i, /'([^']|\\')+'/); }
-  function dqstring(i) { return rex('dqs', i, /"([^"]|\\")+"/); } // FIXME
+
+  function dqstr(i) { return rex('dqstr', i, /(\\{|\\"|[^"{])+/); }
+  function dqelt(i) { return alt(null, i, dqstr, pbracket); }
+  function dqstart(i) { return rex(null, i, /\s*"/); }
+  function dqend(i) { return rex(null, i, /"\s*/); }
+
+  function dqstring(i) { return seq('dqs', i, dqstart, dqelt, '*', dqend); }
 
   function table(i) { return seq('table', i, atsig, exp); }
 
@@ -126,7 +132,7 @@ var MaboStringParser = Jaabro.makeParser(function() {
 
   function pbracket(i) { return eseq('exps', i, pbstart, exp, semco, pbend); }
 
-  function str(i) { return rex('sqs', i, /([^{]|\\{)+/s); }
+  function str(i) { return rex('str', i, /([^{]|\\{)+/s); }
 
   function str_or_pbracket(i) { return alt(null, i, str, pbracket); }
 
@@ -142,6 +148,8 @@ var MaboStringParser = Jaabro.makeParser(function() {
     return { t: t.name, s: t.string() }; }
   function _rewrite_st(t) {
     return { t: t.name, s: t.string().trim() }; }
+  function _rewrite_str(t) {
+    return { t: 'str', s: t.string() }; }
   function _rewrite_sub(t) {
     return t.subgather().map(rewrite); }
   function _rewrite_nsub(t) {
@@ -177,7 +185,13 @@ var MaboStringParser = Jaabro.makeParser(function() {
   function rewrite_pos(t) {
     return { t: 'pos', n: parseInt(t.string(), 10) }; }
 
-  var rewrite_sqs = _rewrite_s;
+  var rewrite_dqstr = _rewrite_str;
+  var rewrite_dqs = _rewrite_nsub;
+
+  var rewrite_str = _rewrite_str;
+
+  function rewrite_sqs(t) {
+    return { t: 'str', s: t.string().slice(1, -1) }; }
   var rewrite_sop = _rewrite_st;
   var rewrite_vname = _rewrite_s;
 
@@ -255,8 +269,11 @@ var MaboTableSet = (function() {
     return r; };
   evals.par = evals.exps;
 
-  evals.sqs = function(set, n) {
-    return n.s.slice(1, -1); };
+  evals.str = function(set, n) {
+    return n.s; };
+
+  evals.dqs = function(set, n) {
+    return n.a.map(function(nn) { return '' + evalNode(set, nn); }).join(''); };
 
   evals.vname = function(set, n) {
     if (n.s.match(/^[A-Z][A-Z0-9_]*$/)) {
