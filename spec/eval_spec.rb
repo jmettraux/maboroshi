@@ -152,8 +152,12 @@ describe 'MaboTableSet' do
         "{ 2 * 3 }" => 6,
         "{ 'a' * 3 }" => 'aaa',
 
-        #"{ parseInt }" => 0,
+        #"{ nada('xxx') }" => '',
+        #"{ parseInt }" => '',
+
         "{ parseInt('12') }" => 12,
+
+        "{ mod = -2; sprintf('%+4d', mod) }" => "  -2",
 
       }.each do |k, v|
 
