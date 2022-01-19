@@ -754,5 +754,44 @@ var MaboTableSet = (function() {
 
 
 MaboTableSet.funcs.parseInt = function(s) {
-  return parseInt(s, 10); };
+  return parseInt(s, 10);
+};
+
+MaboTableSet.funcs.sprintf = function() {
+  var s = arguments[0];
+  var args = Array.from(arguments).slice(1);
+  var r = '';
+  var m, a0, a;
+  while (s.length > 0) {
+    m = s.match(/^([^%]*)(.*)$/);
+    r = r + m[1];
+    s = m[2];
+    m = s.match(/^(%%|%-?\+?\d*[sdj])(.*)$/);
+    if (m && m[1] === '%%') {
+      r = r + '%';
+      s = m[2];
+    }
+    else if (m) {
+      a0 = args.shift(); a = '' + a0;
+      var min = !! m[1].match(/^%-/);
+      var plu = !! m[1].match(/\+\d/);
+      var wid = m[1].match(/\d+/); wid = wid && parseInt(wid, 10);
+      if (m[1].endsWith('j')) {
+        a = JSON.stringify(a0);
+      }
+      else if (m[1].endsWith('d')) {
+        if (plu && a0 >= 0) a = '+' + a0;
+        if (wid) a = a[min ? 'padEnd' : 'padStart'](wid, ' ');
+      }
+      else if (m[1].endsWith('s')) {
+        if (wid) a = a[min ? 'padEnd' : 'padStart'](wid, ' ');
+      }
+      //else {
+      //}
+      r = r + a;
+      s = m[2];
+    }
+  }
+  return r;
+};
 
