@@ -750,6 +750,9 @@ var MaboTableSet = (function() {
   };
 
   var aviComexps = function(value, index) {
+    if ((typeof value) === 'function') {
+      return value.apply(null, index.a);
+    }
     var i = index.a[0];
     if (i < 0) i = value.length + i;
     var l = index.a[1];
@@ -783,6 +786,13 @@ var MaboTableSet = (function() {
     return value;
   };
 
+  var fetchString = function(n) {
+    if (n.s) return n.s;
+    var s = null;
+    if (n.a) n.a.forEach(function(nn) { s = s || fetchString(nn); });
+    return s;
+  };
+
   evals.ocall = function(set, n) {
     return n.a
       .map(function(nn) { return evalNode(set, nn); })
@@ -790,9 +800,10 @@ var MaboTableSet = (function() {
   };
 
   evals.table = async function(set, n) {
-    var t = set.tables[n.s];
+    var s = evalNode(set, n.a[0]) || fetchString(n);
+    var t = set.tables[s];
     if (t) return rollOnListTable(set, t);
-    if ( ! n.s.match(/\.md/)) throw 'unknown table "' + n.s + '"';
+    if ( ! s.match(/\.md/)) throw 'unknown table "' + n.s + '"';
     t = await MaboTableSet.make(n.s);
     t.parent = set;
     return t.roll();
@@ -828,8 +839,23 @@ var MaboTableSet = (function() {
     var r = 1;
     for (var i = 0, l = n.a.length; i < l; i++) {
       var e = n.a[i];
-      if (e.t === 'sop') mod = e.s === '*' ? 1 : -1;
-      else r = r * Math.pow(evalNode(set, e), mod);
+      if (e.t === 'sop') {
+        mod = e.s === '*' ? 1 : -1;
+      }
+      else {
+        var ee = evalNode(set, e);
+        if (typeof r === 'number' && typeof ee !== 'number') {
+          r = ee;
+        }
+        else if (typeof r === 'string' && typeof ee === 'number') {
+          var r0 = r;
+          r = '';
+          for (var j = 0; j < ee; j++) { r = r + r0; }
+        }
+        else {
+          r = r * Math.pow(evalNode(set, e), mod);
+        }
+      }
     }
     return r;
   }
@@ -939,15 +965,6 @@ var MaboTableSet = (function() {
     return val;
   };
 
-      // "{TRUE ? 0 : 1 }" =>
-      //   [{"t"=>"exps",
-      //     "a"=>
-      //      [{"t"=>"exp", <--------------------------------------------------
-      //        "a"=>
-      //         [{"t"=>"heter", "a"=>[
-      //           {"t"=>"boo", "b"=>true}, {"t"=>"num", "n"=>0}]},
-      //          {"t"=>"num", "n"=>1}]}]}],
-      //
   evals._ter = function(set, n) {
     var con = n.a[0].a[0];
     var the = n.a[0].a[1];
@@ -963,7 +980,10 @@ var MaboTableSet = (function() {
 
   var evalNode = function(set, n) {
 
-//clog('evalNode()', n);
+    if ( ! set.parent) for (var k in funcs) {
+      if ( ! set.vars.hasOwnProperty(k)) set.vars[k] = funcs[k];
+    }
+
     var ev = evals[n.t];
     if ( ! ev) throw "evals." + n.t + " not implemented.";
     return ev(set, n);
@@ -1156,7 +1176,11 @@ var MaboTableSet = (function() {
     return r;
   };
 
+  var funcs = {}; // filled below...
+
   // public functions
+
+  this.funcs = funcs;
 
   this.debugEval = function(s) {
 
@@ -1165,7 +1189,9 @@ var MaboTableSet = (function() {
 
     var h = arguments[1] || { vars: {} };
 
-    return [ evalNode(h, t[0]), h ];
+    return [
+      evalNode(h, t[0]),
+      h ];
   };
 
   this.doMake = function(uri, s) {
@@ -1191,6 +1217,49 @@ var MaboTableSet = (function() {
   return this;
 
 }).apply({}); // end MaboTableSet
+
+
+MaboTableSet.funcs.parseInt = function(s) {
+  return parseInt(s, 10);
+};
+
+MaboTableSet.funcs.sprintf = function() {
+  var s = arguments[0];
+  var args = Array.from(arguments).slice(1);
+  var r = '';
+  var m, a0, a;
+  while (s.length > 0) {
+    m = s.match(/^([^%]*)(.*)$/);
+    r = r + m[1];
+    s = m[2];
+    m = s.match(/^(%%|%-?\+?\d*[sdj])(.*)$/);
+    if (m && m[1] === '%%') {
+      r = r + '%';
+      s = m[2];
+    }
+    else if (m) {
+      a0 = args.shift(); a = '' + a0;
+      var min = !! m[1].match(/^%-/);
+      var plu = !! m[1].match(/\+\d/);
+      var wid = m[1].match(/\d+/); wid = wid && parseInt(wid, 10);
+      if (m[1].endsWith('j')) {
+        a = JSON.stringify(a0);
+      }
+      else if (m[1].endsWith('d')) {
+        if (plu && a0 >= 0) a = '+' + a0;
+        if (wid) a = a[min ? 'padEnd' : 'padStart'](wid, ' ');
+      }
+      else if (m[1].endsWith('s')) {
+        if (wid) a = a[min ? 'padEnd' : 'padStart'](wid, ' ');
+      }
+      //else {
+      //}
+      r = r + a;
+      s = m[2];
+    }
+  }
+  return r;
+};
 
 
 /* h-1.2.0.min.js | MIT license: https://github.com/jmettraux/h.js/LICENSE.txt */var H=function(){var f=this;this.VERSION="1.2.0";this.toArray=function(b){return Array.prototype.slice.call(b)};var w=function(b){return b.replace(/\[-([-_a-zA-Z0-9]+)(=|\])/g,"[data-$1$2")},t=function(b,d,a){d=w(d);return a?b.querySelectorAll(d):b.querySelector(d)},x=function(b,d){d||(d=b,b=document);b||(b=document);"string"===typeof b&&(b=t(document,b));return[b,d]},h=function(b,d){var a=x(b,d),c=a[0];d=a[1];if("string"!==typeof d)return d;if(a=d.match(/^\^([^ ]+)(.*)$/))c=f.closest(c,a[1]),d=a[2].trim();

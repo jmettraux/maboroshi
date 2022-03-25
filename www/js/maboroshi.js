@@ -327,6 +327,13 @@ var MaboTableSet = (function() {
     return value;
   };
 
+  var fetchString = function(n) {
+    if (n.s) return n.s;
+    var s = null;
+    if (n.a) n.a.forEach(function(nn) { s = s || fetchString(nn); });
+    return s;
+  };
+
   evals.ocall = function(set, n) {
     return n.a
       .map(function(nn) { return evalNode(set, nn); })
@@ -334,9 +341,10 @@ var MaboTableSet = (function() {
   };
 
   evals.table = async function(set, n) {
-    var t = set.tables[n.s];
+    var s = evalNode(set, n.a[0]) || fetchString(n);
+    var t = set.tables[s];
     if (t) return rollOnListTable(set, t);
-    if ( ! n.s.match(/\.md/)) throw 'unknown table "' + n.s + '"';
+    if ( ! s.match(/\.md/)) throw 'unknown table "' + n.s + '"';
     t = await MaboTableSet.make(n.s);
     t.parent = set;
     return t.roll();
@@ -517,7 +525,6 @@ var MaboTableSet = (function() {
       if ( ! set.vars.hasOwnProperty(k)) set.vars[k] = funcs[k];
     }
 
-//clog('evalNode()', n);
     var ev = evals[n.t];
     if ( ! ev) throw "evals." + n.t + " not implemented.";
     return ev(set, n);
