@@ -1260,6 +1260,9 @@ MaboTableSet.funcs.sprintf = function() {
   }
   return r;
 };
+MaboTableSet.funcs.f2d = function(n) {
+  return MaboTableSet.funcs.sprintf('%2d', n);
+};
 
 
 /* h-1.2.0.min.js | MIT license: https://github.com/jmettraux/h.js/LICENSE.txt */var H=function(){var f=this;this.VERSION="1.2.0";this.toArray=function(b){return Array.prototype.slice.call(b)};var w=function(b){return b.replace(/\[-([-_a-zA-Z0-9]+)(=|\])/g,"[data-$1$2")},t=function(b,d,a){d=w(d);return a?b.querySelectorAll(d):b.querySelector(d)},x=function(b,d){d||(d=b,b=document);b||(b=document);"string"===typeof b&&(b=t(document,b));return[b,d]},h=function(b,d){var a=x(b,d),c=a[0];d=a[1];if("string"!==typeof d)return d;if(a=d.match(/^\^([^ ]+)(.*)$/))c=f.closest(c,a[1]),d=a[2].trim();

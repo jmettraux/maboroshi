@@ -1,12 +1,15 @@
 
 # aachen_character
+{
+""
+}
 
-STR  DC: {sprintf('%2d', str = 3d6)}  TC: {21 - str}
-CON  DC: {sprintf('%2d', con = 3d6)}  TC: {21 - con}
-DEX  DC: {sprintf('%2d', dex = 3d6)}  TC: {21 - dex}
-INT  DC: {sprintf('%2d', int = 3d6)}  TC: {21 - int}
-WIS  DC: {sprintf('%2d', wis = 3d6)}  TC: {21 - wis}
-CHA  DC: {sprintf('%2d', cha = 3d6)}  TC: {21 - cha}
+STR  DC: {f2d(str = 3d6)}  TC: {f2d(str_tc = 21 - str)}
+CON  DC: {f2d(con = 3d6)}  TC: {f2d(con_tc = 21 - con)}  Body DC
+DEX  DC: {f2d(dex = 3d6)}  TC: {f2d(dex_tc = 21 - dex)}
+INT  DC: {f2d(int = 3d6)}  TC: {f2d(int_tc = 21 - int)}
+WIS  DC: {f2d(wis = 3d6)}  TC: {f2d(wis_tc = 21 - wis)}
+CHA  DC: {f2d(cha = 3d6)}  TC: {f2d(cha_tc = 21 - cha)}
 
 
 ## mood

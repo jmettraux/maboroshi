@@ -801,4 +801,7 @@ MaboTableSet.funcs.sprintf = function() {
   }
   return r;
 };
+MaboTableSet.funcs.f2d = function(n) {
+  return MaboTableSet.funcs.sprintf('%2d', n);
+};
 
