@@ -1264,6 +1264,11 @@ MaboTableSet.funcs.f2d = function(n) {
   return MaboTableSet.funcs.sprintf('%2d', n);
 };
 
+MaboTableSet.funcs.mean = function() {
+  var as = Array.from(arguments);
+  return Math.ceil(as.reduce(function(r, e) { return r + e; }) / as.length);
+};
+
 
 /* h-1.2.0.min.js | MIT license: https://github.com/jmettraux/h.js/LICENSE.txt */var H=function(){var f=this;this.VERSION="1.2.0";this.toArray=function(b){return Array.prototype.slice.call(b)};var w=function(b){return b.replace(/\[-([-_a-zA-Z0-9]+)(=|\])/g,"[data-$1$2")},t=function(b,d,a){d=w(d);return a?b.querySelectorAll(d):b.querySelector(d)},x=function(b,d){d||(d=b,b=document);b||(b=document);"string"===typeof b&&(b=t(document,b));return[b,d]},h=function(b,d){var a=x(b,d),c=a[0];d=a[1];if("string"!==typeof d)return d;if(a=d.match(/^\^([^ ]+)(.*)$/))c=f.closest(c,a[1]),d=a[2].trim();
 return c?d?t(c,d):c:null},m=function(b,d){var a=x(b,d),c=a[0];d=a[1];a=null;if("string"===typeof d){if(a=d.match(/^\^([^ ]+)(.*)$/))c=f.closest(c,a[1]),d=a[2].trim();a=0<d.length?t(c,d,!0):[c]}else a=[d];for(var c=[],e=0,g=a.length;e<g;e++)c.push(a[e]);return c};this.isElt=this.isElement=function(b){return"object"===typeof b&&"string"===typeof b.tagName&&"function"===typeof b.getElementsByClassName};this.elt=function(b,d){return h(b,d)};this.elts=function(b,d){return m(b,d)};this.count=function(b,

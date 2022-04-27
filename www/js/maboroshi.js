@@ -805,3 +805,8 @@ MaboTableSet.funcs.f2d = function(n) {
   return MaboTableSet.funcs.sprintf('%2d', n);
 };
 
+MaboTableSet.funcs.mean = function() {
+  var as = Array.from(arguments);
+  return Math.ceil(as.reduce(function(r, e) { return r + e; }) / as.length);
+};
+

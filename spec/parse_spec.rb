@@ -27,6 +27,17 @@ describe 'MaboStringParser' do
       "{;;}" =>
         [{"t"=>"exps", "a"=>[]}],
 
+      '{3d6;""}' =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"cdice", "a"=>[{"t"=>"pos", "n"=>3}, {"t"=>"pos", "n"=>6}]},
+            {"t"=>"dqs", "a"=>[]}]}],
+      "{\n1d6;\n\"\"\n}" =>
+        [{"t"=>"exps",
+          "a"=>
+           [{"t"=>"cdice", "a"=>[{"t"=>"pos", "n"=>1}, {"t"=>"pos", "n"=>6}]},
+            {"t"=>"dqs", "a"=>[]}]}],
+
       "a {@ status} goblin" =>
         [{"t"=>"str", "s"=>"a "},
          {"t"=>"exps",
